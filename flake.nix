@@ -4,7 +4,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     systems.url = "github:nix-systems/default";
 
-    # Dev tools
+    rust-overlay.url = "github:oxalica/rust-overlay";
     treefmt-nix.url = "github:numtide/treefmt-nix";
   };
 
@@ -16,12 +16,25 @@
       ];
       perSystem = { config, self', pkgs, lib, system, ... }:
         let
+          rustToolchain = (pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml).override {
+            extensions = [
+              "rust-src"
+              "rust-analyzer"
+            ];
+          };
           cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
           nonRustDeps = [
             pkgs.libiconv
           ];
         in
         {
+          _module.args.pkgs = import inputs.nixpkgs {
+            inherit system;
+            overlays = [
+              inputs.rust-overlay.overlays.default
+            ];
+          };
+
           # Rust package
           packages.default = pkgs.rustPlatform.buildRustPackage {
             inherit (cargoToml.package) name version;
@@ -36,15 +49,13 @@
             ];
             shellHook = ''
               # For rust-analyzer 'hover' tooltips to work.
-              export RUST_SRC_PATH=${pkgs.rustPlatform.rustLibSrc}
+              export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
             '';
             buildInputs = nonRustDeps;
             nativeBuildInputs = with pkgs; [
               just
-              rustc
-              cargo
+              rustToolchain
               cargo-watch
-              rust-analyzer
             ];
           };
 
