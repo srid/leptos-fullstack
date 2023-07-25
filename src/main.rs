@@ -1,3 +1,6 @@
+use std::net::SocketAddr;
+
+use axum::{routing::get, Router};
 use clap::Parser;
 
 #[derive(Parser, Debug)]
@@ -8,15 +11,27 @@ struct Args {
     #[arg(short = 'v')]
     verbose: bool,
 
-    /// an optional name to green
+    /// an optional name to greet
     #[arg()]
     name: Option<String>,
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args = Args::parse();
     if args.verbose {
         println!("DEBUG {args:?}");
     }
-    println!("Hello {}!", args.name.unwrap_or("world".to_string()));
+
+    let app = Router::new().route("/", get(root));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    println!("Launching http://localhost:3000");
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
+
+async fn root() -> &'static str {
+    "Hello, World!"
 }
