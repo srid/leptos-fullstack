@@ -7,3 +7,9 @@ WIP
 - [ ] do vanilla wasm + trunk
     - [ ] `nix build` must work
 - [ ] leptos integrate
+
+## Running locally
+
+```
+just watch
+```

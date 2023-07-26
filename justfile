@@ -5,10 +5,6 @@ default:
 fmt:
     treefmt
 
-# Run 'cargo run' on the project
-run *ARGS:
-    cargo run {{ARGS}}
-
-# Run 'cargo watch' to run the project (auto-recompiles)
+# Run the project locally
 watch *ARGS:
-    cargo watch -x "run -- {{ARGS}}"
+    watch-project

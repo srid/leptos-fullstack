@@ -8,6 +8,8 @@
     crane.url = "github:ipetkov/crane";
     crane.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
+    proc-flake.url = "github:srid/proc-flake";
+    flake-root.url = "github:srid/flake-root";
   };
 
   outputs = inputs:
@@ -15,6 +17,8 @@
       systems = import inputs.systems;
       imports = [
         inputs.treefmt-nix.flakeModule
+        inputs.proc-flake.flakeModule
+        inputs.flake-root.flakeModule
       ];
       perSystem = { config, self', pkgs, lib, system, ... }:
         let
@@ -130,6 +134,8 @@
               rustToolchain
               cargo-watch
               trunk
+
+              config.proc.groups.watch-project.package
             ];
           };
 
@@ -140,6 +146,27 @@
             programs = {
               nixpkgs-fmt.enable = true;
               rustfmt.enable = true;
+            };
+          };
+
+          proc.groups.watch-project = {
+            processes = {
+              frontend.command = lib.getExe (pkgs.writeShellApplication {
+                name = "frontend-watch";
+                text = ''
+                  set -x
+                  cd ./frontend
+                  trunk serve --open
+                '';
+              });
+              backend.command = lib.getExe (pkgs.writeShellApplication {
+                name = "backend-watch";
+                text = ''
+                  set -x
+                  cd ./backend
+                  cargo watch -x run
+                '';
+              });
             };
           };
         };
