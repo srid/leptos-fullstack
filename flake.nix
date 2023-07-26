@@ -93,6 +93,7 @@
             shellHook = ''
               # For rust-analyzer 'hover' tooltips to work.
               export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
+              export CLIENT_DIST=$PWD/frontend/dist;
             '';
             buildInputs = [
               pkgs.libiconv

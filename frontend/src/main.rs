@@ -16,9 +16,9 @@ fn start_app() {
         .create_element("a")
         .expect("Failed to create <a> element");
     alink
-        .set_attribute("href", "/api")
+        .set_attribute("href", "/hello")
         .expect("Failed to set href");
-    alink.set_inner_html("/api");
+    alink.set_inner_html("/hello");
     body.append_child(text_node.as_ref())
         .expect("Failed to append text");
     body.append_child(alink.as_ref())
