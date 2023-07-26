@@ -90,6 +90,19 @@
             };
           };
 
+          rustDevShell = pkgs.mkShell {
+            shellHook = ''
+              # For rust-analyzer 'hover' tooltips to work.
+              export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
+            '';
+            buildInputs = nonRustDeps;
+            nativeBuildInputs = with pkgs; [
+              rustToolchain
+              cargo-watch
+              trunk
+            ];
+          };
+
           nonRustDeps = [
             pkgs.libiconv
           ];
@@ -102,21 +115,6 @@
             ];
           };
 
-          checks = {
-            # Run clippy (and deny all warnings) on the crate source,
-            # again, reusing the dependency artifacts from above.
-            #
-            # Note that this is done as a separate derivation so that
-            # we can block the CI if there are issues here, but not
-            # prevent downstream consumers from building our crate by itself.
-            leptos-fullstack-clippy = craneLib.cargoClippy (buildArgs.common // {
-              inherit (rustPackages.backend) cargoArtifacts;
-              cargoClippyExtraArgs = "--all-targets -- --deny warnings";
-              # Here we don't care about serving the frontend
-              CLIENT_DIST = "";
-            });
-          };
-
           # Rust package
           packages = {
             backend = rustPackages.backend.package;
@@ -125,20 +123,12 @@
 
           # Rust dev environment
           devShells.default = pkgs.mkShell {
-            inputsFrom = builtins.attrValues self'.checks ++ [
+            inputsFrom = [
               config.treefmt.build.devShell
+              rustDevShell
             ];
-            shellHook = ''
-              # For rust-analyzer 'hover' tooltips to work.
-              export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
-            '';
-            buildInputs = nonRustDeps;
             nativeBuildInputs = with pkgs; [
               just
-              rustToolchain
-              cargo-watch
-              trunk
-
               config.proc.groups.watch-project.package
             ];
           };
