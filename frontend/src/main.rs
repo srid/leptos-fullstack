@@ -14,8 +14,13 @@ fn start_app() {
     let body = document.body().expect("Could not access document.body");
 
     let thing = Thing::new("Hello from frontend".to_string());
-    body.append_child(document.create_text_node(&thing.browser_view()).as_ref())
+    let thing_p = document
+        .create_element("p")
+        .expect("Failed to create <p> element");
+    thing_p
+        .append_child(document.create_text_node(&thing.browser_view()).as_ref())
         .expect("Failed to append text");
+    body.append_child(&thing_p).expect("Failed to append <p>");
 
     let text_node = document.create_text_node("\nTo visit backend page, click: ");
 
@@ -25,7 +30,7 @@ fn start_app() {
     alink
         .set_attribute("href", "/hello")
         .expect("Failed to set href");
-    alink.set_inner_html("/hello");
+    alink.set_text_content(Some("/hello"));
     body.append_child(text_node.as_ref())
         .expect("Failed to append text");
     body.append_child(alink.as_ref())
