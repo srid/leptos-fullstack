@@ -83,7 +83,6 @@
               # Build the frontend of the application.
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
-                pname = "frontend";
                 cargoArtifacts = cargoArtifacts;
                 trunkIndexPath = "frontend/index.html";
               });
@@ -95,17 +94,15 @@
               # For rust-analyzer 'hover' tooltips to work.
               export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
             '';
-            buildInputs = nonRustDeps;
+            buildInputs = [
+              pkgs.libiconv
+            ];
             nativeBuildInputs = with pkgs; [
               rustToolchain
               cargo-watch
               trunk
             ];
           };
-
-          nonRustDeps = [
-            pkgs.libiconv
-          ];
         in
         {
           _module.args.pkgs = import inputs.nixpkgs {
