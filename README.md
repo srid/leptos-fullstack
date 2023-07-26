@@ -6,11 +6,20 @@ WIP
 - [x] use axum
 - [x] do vanilla wasm + trunk
     - [x] `nix build` must work
-- [ ] leptos integrate
+- [x] leptos integrate
 - [ ] tailwind
+- [ ] ssr?
 
 ## Running locally
 
 ```
 just watch
 ```
+
+## Building
+
+```
+nix build
+```
+
+You can also `nix run` the app directly.
