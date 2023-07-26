@@ -4,9 +4,10 @@ WIP
 
 - [x] use nightly
 - [x] use axum
-- [ ] do vanilla wasm + trunk
-    - [ ] `nix build` must work
+- [x] do vanilla wasm + trunk
+    - [x] `nix build` must work
 - [ ] leptos integrate
+- [ ] tailwind
 
 ## Running locally
 
