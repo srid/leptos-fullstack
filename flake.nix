@@ -58,7 +58,7 @@
             # wasm32 target, so we only build the client.
             wasm = common // {
               pname = "leptos-fullstack-wasm";
-              cargoExtraArgs = "--package=frontend";
+              cargoExtraArgs = "--package=leptos-fullstack-frontend";
               CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
             };
           };
@@ -114,9 +114,10 @@
           };
 
           # Rust package
-          packages = {
+          packages = rec {
             backend = rustPackages.backend.package;
             frontend = rustPackages.frontend.package;
+            default = backend;
           };
 
           # Rust dev environment
