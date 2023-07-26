@@ -4,5 +4,6 @@ WIP
 
 - [x] use nightly
 - [x] use axum
-- [ ] do wasm
+- [ ] do vanilla wasm + trunk
+    - [ ] `nix build` must work
 - [ ] leptos integrate
