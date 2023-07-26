@@ -1,4 +1,6 @@
 use axum::{routing::get, Router};
+use axum_macros::debug_handler;
+use leptos_fullstack_common::Thing;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
 
@@ -15,6 +17,8 @@ async fn main() {
         .unwrap();
 }
 
-async fn root() -> &'static str {
-    "Hello, World!"
+#[debug_handler]
+async fn root() -> String {
+    let thing = Thing::new("Hello from backend".to_string());
+    serde_json::to_string(&thing).unwrap()
 }

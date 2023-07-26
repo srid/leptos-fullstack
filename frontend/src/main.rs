@@ -1,4 +1,5 @@
 use console_error_panic_hook::set_once as set_panic_hook;
+use leptos_fullstack_common::Thing;
 use web_sys::window;
 
 pub fn main() {
@@ -11,7 +12,13 @@ fn start_app() {
         .and_then(|win| win.document())
         .expect("Could not access document");
     let body = document.body().expect("Could not access document.body");
-    let text_node = document.create_text_node("Hello! To visit backend page, click: ");
+
+    let thing = Thing::new("Hello from frontend".to_string());
+    body.append_child(document.create_text_node(&thing.browser_view()).as_ref())
+        .expect("Failed to append text");
+
+    let text_node = document.create_text_node("\nTo visit backend page, click: ");
+
     let alink = document
         .create_element("a")
         .expect("Failed to create <a> element");
