@@ -1,4 +1,5 @@
 /target
 /result
 /result-lib
+/frontend/dist
 .direnv
