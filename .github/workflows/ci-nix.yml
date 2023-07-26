@@ -11,4 +11,4 @@ jobs:
     - name: Install Nix
       uses: DeterminateSystems/nix-installer-action@main
     - run: nix develop -c rustc --version
-    - run: nix run
+    - run: nix build .#backend
