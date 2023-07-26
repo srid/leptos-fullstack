@@ -7,8 +7,8 @@ WIP
 - [x] do vanilla wasm + trunk
     - [x] `nix build` must work
 - [x] leptos integrate
-- [ ] tailwind
-- [ ] ssr?
+- [x] tailwind
+- [ ] [ssr](https://leptos-rs.github.io/leptos/ssr/index.html) and [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
 
 ## Running locally
 
@@ -23,3 +23,4 @@ nix build
 ```
 
 You can also `nix run` the app directly.
+

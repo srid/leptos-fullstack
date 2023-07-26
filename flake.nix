@@ -34,7 +34,6 @@
             src = ./.; # The original, unfiltered source
             filter = path: type:
               (lib.hasSuffix "\.html" path) ||
-              (lib.hasSuffix "\.scss" path) ||
               # Example of a folder for images, icons, etc
               (lib.hasInfix "/assets/" path) ||
               # Default filter from crane (allow .rs files)
@@ -130,6 +129,16 @@
             nativeBuildInputs = with pkgs; [
               just
               config.proc.groups.watch-project.package
+              (pkgs.nodePackages.tailwindcss.overrideAttrs
+                (oa: {
+                  plugins = [
+                    pkgs.nodePackages."@tailwindcss/aspect-ratio"
+                    pkgs.nodePackages."@tailwindcss/forms"
+                    pkgs.nodePackages."@tailwindcss/language-server"
+                    pkgs.nodePackages."@tailwindcss/line-clamp"
+                    pkgs.nodePackages."@tailwindcss/typography"
+                  ];
+                }))
             ];
           };
 
