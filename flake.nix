@@ -69,6 +69,7 @@
               # all of that work (e.g. via cachix) when running in CI
               cargoArtifacts = craneLib.buildDepsOnly buildArgs.native;
               package = craneLib.buildPackage (buildArgs.native // {
+                pname = "leptos-fullstack";
                 inherit cargoArtifacts;
                 # The server needs to know where the client's dist dir is to
                 # serve it, so we pass it as an environment variable at build time
