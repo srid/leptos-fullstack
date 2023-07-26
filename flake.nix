@@ -84,7 +84,7 @@
               # Build the frontend of the application.
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
-                cargoArtifacts = cargoArtifacts;
+                inherit cargoArtifacts;
                 trunkIndexPath = "frontend/index.html";
               });
             };
