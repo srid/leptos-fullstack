@@ -7,4 +7,5 @@ fmt:
 
 # Run the project locally
 watch *ARGS:
+    rm -rf ./frontend/dist
     watch-project
