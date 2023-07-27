@@ -18,4 +18,6 @@ log = "0.4"
 # The version here must match the pinned stuff in Nix flakes.
 wasm-bindgen = "=0.2.84"
 console_error_panic_hook = "0.1"
-leptos-fullstack-common = { version = "0.1.0", path = "../common" }
+leptos-fullstack-common = { version = "0.1.0", path = "../common", features = [
+    "csr",
+] }
