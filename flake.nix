@@ -49,6 +49,7 @@
               inherit src;
               pname = "leptos-fullstack";
               version = "0.1.0";
+              SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
             };
             native = common // {
               pname = "leptos-fullstack-native";
@@ -66,7 +67,7 @@
             backend = rec {
               # Build *just* the cargo dependencies, so we can reuse
               # all of that work (e.g. via cachix) when running in CI
-              cargoArtifacts = craneLib.buildDepsOnly buildArgs.native;
+              cargoArtifacts = craneLib.buildDepsOnly (buildArgs.native // { });
               package = craneLib.buildPackage (buildArgs.native // {
                 pname = "leptos-fullstack";
                 inherit cargoArtifacts;

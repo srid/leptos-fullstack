@@ -1,4 +1,7 @@
-use axum::{routing::get, Router};
+use axum::{
+    routing::{get, post},
+    Router,
+};
 use axum_macros::debug_handler;
 use leptos_fullstack_common::Thing;
 use std::net::SocketAddr;
@@ -8,6 +11,7 @@ use tower_http::services::ServeDir;
 async fn main() {
     let app = Router::new()
         .nest_service("/", ServeDir::new(env!("CLIENT_DIST")))
+        .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .route("/hello", get(root));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
     println!("Launching http://localhost:3000");

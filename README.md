@@ -8,7 +8,9 @@ WIP
     - [x] `nix build` must work
 - [x] leptos integrate
 - [x] tailwind
-- [ ] [ssr](https://leptos-rs.github.io/leptos/ssr/index.html) and [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
+- final
+    - [x] [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
+    - [ ] [ssr](https://leptos-rs.github.io/leptos/ssr/index.html)
 
 ## Running locally
 
