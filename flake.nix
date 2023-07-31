@@ -52,7 +52,7 @@
               inherit src;
               pname = "leptos-fullstack";
               version = "0.1.0";
-              SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
+              # SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
             };
             native = common // {
               pname = "leptos-fullstack-native";

@@ -9,7 +9,7 @@ pub fn App(cx: Scope) -> impl IntoView {
 
     view! {
         cx,
-        <Stylesheet id="leptos" href="/pkg/tailwind.css"/>
+        <Stylesheet id="leptos" href="/pkg/leptos-fullstack.css"/>
         <Router>
             <Routes>
                 <Route path="" view=  move |cx| view! { cx, <Home/> }/>
@@ -31,7 +31,9 @@ fn Home(cx: Scope) -> impl IntoView {
                     <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
                     <pre>{thing.browser_view()}</pre>
                     <Header2 text="Backend" />
-                    {move || {
+                    // FIXME: Uncaught (in promise) RuntimeError: unreachable
+                    // SSR and CSR elements have the same hydration key but different node kinds.
+                    /* {move || {
                         things.read(cx)
                             .map(move |things| match things {
                                 Err(e) => {
@@ -46,8 +48,9 @@ fn Home(cx: Scope) -> impl IntoView {
                                     }).collect_view(cx)
                                 }
                             })
-                    }}
+                    }} */
                     <Link link="/hello" text="request backend /hello API" />
+                    <Counter />
                 </div>
             </div>
         </div>
@@ -71,5 +74,22 @@ fn Header1(cx: Scope, text: &'static str) -> impl IntoView {
 fn Header2(cx: Scope, text: &'static str) -> impl IntoView {
     view! {cx,
         <h2 class="my-2 text-2xl font-bold text-gray-600">{text}</h2>
+    }
+}
+
+/// Renders the home page of your application.
+#[component]
+fn Counter(cx: Scope) -> impl IntoView {
+    // Creates a reactive value to update the button
+    let (count, set_count) = create_signal(cx, 0);
+    let on_click = move |_| set_count.update(|count| *count += 1);
+
+    view! { cx,
+        <div class="mx-auto my-8 text-center md:container">
+            <h1 class="mb-4 text-3xl font-bold text-pink-500">"Leptops Counter"</h1>
+            <button
+                class="p-4 border-2 rounded-full shadow-lg active:shadow-none bg-blue-50 hover:bg-blue-200 active:bg-blue-500"
+                on:click=on_click>"Click Me: " {count}</button>
+        </div>
     }
 }
