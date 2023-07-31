@@ -90,7 +90,7 @@
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
                 inherit cargoArtifacts;
-                cargoExtraArgs = cargoExtraArgs.frontend;
+                trunkExtraBuildArgs = cargoExtraArgs.frontend;
                 trunkIndexPath = "index.html";
                 buildInputs = [ tailwindcss ];
               });
@@ -168,14 +168,14 @@
                 name = "frontend-watch";
                 text = ''
                   set -x
-                  trunk serve --open --features csr
+                  trunk serve --open ${cargoExtraArgs.frontend}
                 '';
               });
               backend.command = lib.getExe (pkgs.writeShellApplication {
                 name = "backend-watch";
                 text = ''
                   set -x
-                  cargo watch -x run  --features ssr
+                  cargo watch -x run  ${cargoExtraArgs.backend}
                 '';
               });
             };
