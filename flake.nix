@@ -43,7 +43,7 @@
             ;
           };
 
-          buildArgs = rec {
+          buildArgs = {
             # Arguments to be used by both the client and the server
             # When building a workspace with crane, it's a good idea
             # to set "pname" and "version".
@@ -53,51 +53,9 @@
               version = "0.1.0";
               # SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
             };
-            native = common // {
-              pname = "leptos-fullstack-native";
-            };
-            # it's not possible to build the server on the
-            # wasm32 target, so we only build the client.
-            wasm = common // {
-              pname = "leptos-fullstack-wasm";
-              CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
-            };
           };
 
-          cargoExtraArgs = {
-            frontend = "--features hydrate";
-            backend = "--features ssr";
-          };
-
-          rustPackages = rec {
-            backend = rec {
-              # Build *just* the cargo dependencies, so we can reuse
-              # all of that work (e.g. via cachix) when running in CI
-              cargoArtifacts = craneLib.buildDepsOnly (buildArgs.native // { });
-              package = craneLib.buildPackage (buildArgs.native // {
-                pname = "leptos-fullstack";
-                inherit cargoArtifacts;
-                cargoExtraArgs = cargoExtraArgs.backend;
-                # The server needs to know where the client's dist dir is to
-                # serve it, so we pass it as an environment variable at build time
-                CLIENT_DIST = frontend.package;
-              });
-            };
-
-            frontend = rec {
-              cargoArtifacts = craneLib.buildDepsOnly (buildArgs.wasm // {
-                doCheck = false;
-              });
-              # Build the frontend of the application.
-              # This derivation is a directory you can put on a webserver.
-              package = craneLib.buildTrunkPackage (buildArgs.wasm // {
-                inherit cargoArtifacts;
-                trunkExtraBuildArgs = cargoExtraArgs.frontend;
-                trunkIndexPath = "index.html";
-                nativeBuildInputs = [ tailwindcss ];
-              });
-            };
-
+          rustPackages = {
             default = rec {
               args = buildArgs.common // {
                 doCheck = false;
