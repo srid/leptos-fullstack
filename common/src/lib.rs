@@ -20,11 +20,8 @@ impl Thing {
     }
 }
 
-#[server(ReadThings, "/api")]
+#[server(ReadThings, "/api", "Url", "read-things")]
 pub async fn read_things() -> Result<Vec<Thing>, leptos::ServerFnError> {
-    Ok(vec![
-        Thing::new("Hello 1 from backend".to_string()),
-        Thing::new("Hello 2 from backend".to_string()),
-        Thing::new("Hello 3 from backend".to_string()),
-    ])
+    // Implementation should be defined in backend crate
+    unimplemented!()
 }
