@@ -8,8 +8,6 @@
     crane.url = "github:ipetkov/crane";
     crane.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.url = "github:numtide/treefmt-nix";
-    proc-flake.url = "github:srid/proc-flake";
-    flake-root.url = "github:srid/flake-root";
   };
 
   outputs = inputs:
@@ -17,7 +15,6 @@
       systems = import inputs.systems;
       imports = [
         inputs.treefmt-nix.flakeModule
-        inputs.flake-root.flakeModule
       ];
       perSystem = { config, self', pkgs, lib, system, ... }:
         let
@@ -33,8 +30,6 @@
             src = ./.; # The original, unfiltered source
             filter = path: type:
               (lib.hasSuffix "\.html" path) ||
-              # Trunk assets
-              (lib.hasSuffix "Trunk.toml" path) ||
               (lib.hasSuffix "tailwind.config.js" path) ||
               # Example of a folder for images, icons, etc
               (lib.hasInfix "/assets/" path) ||
@@ -59,7 +54,6 @@
             default = rec {
               args = buildArgs.common // {
                 doCheck = false;
-
                 buildInputs = [
                   pkgs.cargo-leptos
                   pkgs.binaryen # Provides wasm-opt
@@ -72,7 +66,6 @@
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
                 installPhaseCommand = ''
                   mkdir -p $out/bin
-                  find target
                   cp target/server/release/leptos-fullstack $out/bin/
                   cp -r target/site $out/bin/
                 '';
@@ -85,7 +78,6 @@
             shellHook = ''
               # For rust-analyzer 'hover' tooltips to work.
               export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
-              export CLIENT_DIST=$PWD/dist;
             '';
             buildInputs = [
               pkgs.libiconv
@@ -93,7 +85,6 @@
             nativeBuildInputs = with pkgs; [
               rustToolchain
               cargo-watch
-              trunk
             ];
           };
 
