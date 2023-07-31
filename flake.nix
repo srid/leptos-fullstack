@@ -58,7 +58,7 @@
             # wasm32 target, so we only build the client.
             wasm = common // {
               pname = "leptos-fullstack-wasm";
-              cargoExtraArgs = "--package=leptos-fullstack-frontend";
+              cargoExtraArgs = "--package=leptos-fullstack";
               CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
             };
           };
@@ -71,6 +71,7 @@
               package = craneLib.buildPackage (buildArgs.native // {
                 pname = "leptos-fullstack";
                 inherit cargoArtifacts;
+                cargoExtraArgs = "--features ssr";
                 # The server needs to know where the client's dist dir is to
                 # serve it, so we pass it as an environment variable at build time
                 CLIENT_DIST = frontend.package;
@@ -85,7 +86,9 @@
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
                 inherit cargoArtifacts;
-                trunkIndexPath = "frontend/index.html";
+                cargoExtraArgs = "--features csr";
+                trunkIndexPath = "index.html";
+                buildInputs = [ tailwindcss ];
               });
             };
           };
@@ -94,7 +97,7 @@
             shellHook = ''
               # For rust-analyzer 'hover' tooltips to work.
               export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
-              export CLIENT_DIST=$PWD/frontend/dist;
+              export CLIENT_DIST=$PWD/dist;
             '';
             buildInputs = [
               pkgs.libiconv
@@ -105,6 +108,17 @@
               trunk
             ];
           };
+
+          tailwindcss = pkgs.nodePackages.tailwindcss.overrideAttrs
+            (oa: {
+              plugins = [
+                pkgs.nodePackages."@tailwindcss/aspect-ratio"
+                pkgs.nodePackages."@tailwindcss/forms"
+                pkgs.nodePackages."@tailwindcss/language-server"
+                pkgs.nodePackages."@tailwindcss/line-clamp"
+                pkgs.nodePackages."@tailwindcss/typography"
+              ];
+            });
         in
         {
           _module.args.pkgs = import inputs.nixpkgs {
@@ -130,16 +144,7 @@
             nativeBuildInputs = with pkgs; [
               just
               config.proc.groups.watch-project.package
-              (pkgs.nodePackages.tailwindcss.overrideAttrs
-                (oa: {
-                  plugins = [
-                    pkgs.nodePackages."@tailwindcss/aspect-ratio"
-                    pkgs.nodePackages."@tailwindcss/forms"
-                    pkgs.nodePackages."@tailwindcss/language-server"
-                    pkgs.nodePackages."@tailwindcss/line-clamp"
-                    pkgs.nodePackages."@tailwindcss/typography"
-                  ];
-                }))
+              tailwindcss
             ];
           };
 
@@ -159,7 +164,6 @@
                 name = "frontend-watch";
                 text = ''
                   set -x
-                  cd ./frontend
                   trunk serve --open
                 '';
               });
@@ -167,8 +171,7 @@
                 name = "backend-watch";
                 text = ''
                   set -x
-                  cd ./backend
-                  cargo watch -x run
+                  cargo watch -x run  --features ssr
                 '';
               });
             };

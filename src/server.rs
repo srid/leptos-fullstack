@@ -1,14 +1,19 @@
+use cfg_if::cfg_if;
+
+cfg_if! {
+if #[cfg(feature = "ssr")] {
+
 use axum::{
     routing::{get, post},
     Router,
 };
 use axum_macros::debug_handler;
-use leptos_fullstack_common::Thing;
 use std::net::SocketAddr;
+use thing::Thing;
 use tower_http::services::ServeDir;
 
 #[tokio::main]
-async fn main() {
+pub async fn main() {
     let app = Router::new()
         .nest_service("/", ServeDir::new(env!("CLIENT_DIST")))
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
@@ -25,4 +30,7 @@ async fn main() {
 async fn root() -> String {
     let thing = Thing::new("Hello from backend".to_string());
     serde_json::to_string(&thing).unwrap()
+}
+
+}
 }

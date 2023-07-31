@@ -1,5 +1,5 @@
+use crate::thing::{read_things, Thing};
 use leptos::*;
-use leptos_fullstack_common::{read_things, Thing};
 use leptos_meta::*;
 use leptos_router::*;
 
