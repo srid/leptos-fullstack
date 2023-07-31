@@ -66,7 +66,7 @@
           };
 
           cargoExtraArgs = {
-            frontend = "--features csr";
+            frontend = "--features hydrate";
             backend = "--features ssr";
           };
 

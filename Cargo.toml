@@ -30,7 +30,7 @@ tokio = { version = "1.29", features = ["full"], optional = true }
 tower-http = { version = "0.4", features = ["full"], optional = true }
 
 [features]
-csr = ["leptos/csr", "leptos_meta/csr", "leptos_router/csr"]
+hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
 ssr = [
     "leptos/ssr",
     "leptos_meta/ssr",
@@ -42,6 +42,18 @@ ssr = [
     "dep:axum-macros",
 ]
 
+# Defines a size-optimized profile for the WASM bundle in release mode
+[profile.wasm-release]
+inherits = "release"
+opt-level = 'z'
+lto = true
+codegen-units = 1
+panic = "abort"
+
 [package.metadata.leptos]
 style-file = "assets/css/output.css"
 bin-features = ["ssr"]
+# The profile to use for the lib target when compiling for release
+#
+# Optional. Defaults to "release".
+lib-profile-release = "wasm-release"

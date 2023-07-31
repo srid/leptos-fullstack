@@ -3,18 +3,6 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-#[cfg(not(feature = "ssr"))]
-pub fn main() {
-    _ = console_log::init_with_level(log::Level::Debug);
-    console_error_panic_hook::set_once();
-
-    // TODO: ssr
-    log!("csr mode - mounting to body");
-    mount_to_body(|cx| {
-        view! { cx, <App /> }
-    });
-}
-
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
     provide_meta_context(cx);
