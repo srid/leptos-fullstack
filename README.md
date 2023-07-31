@@ -26,3 +26,10 @@ nix build
 
 You can also `nix run` the app directly.
 
+## Notes
+
+### server fns are decoupled
+
+The `common` contains server fns but without a function body (uses `unimplemeted!` macro). The actual implementation lives in the `backend` crates, where we assume the exact same function signature and server macro spec is used. 
+
+This decoupling is essential to avoid cyclic dependency or to avoid making the `common` a gigantic monolith with backend logic.

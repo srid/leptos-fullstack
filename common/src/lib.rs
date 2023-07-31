@@ -22,5 +22,6 @@ impl Thing {
 
 #[server(ReadThings, "/api", "Url", "read-things")]
 pub async fn read_things() -> Result<Vec<Thing>, leptos::ServerFnError> {
+    // Implementation should be defined in backend crate
     unimplemented!()
 }

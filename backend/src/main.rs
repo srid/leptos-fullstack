@@ -22,6 +22,7 @@ async fn main() {
         .unwrap();
 }
 
+// The interface should match that of `common` crate
 #[server(ReadThings, "/api", "Url", "read-things")]
 pub async fn read_things() -> Result<Vec<Thing>, leptos::ServerFnError> {
     Ok(vec![
