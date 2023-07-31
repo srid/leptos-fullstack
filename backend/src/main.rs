@@ -3,6 +3,7 @@ use axum::{
     Router,
 };
 use axum_macros::debug_handler;
+use leptos::*;
 use leptos_fullstack_common::Thing;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
@@ -19,6 +20,15 @@ async fn main() {
         .serve(app.into_make_service())
         .await
         .unwrap();
+}
+
+#[server(ReadThings, "/api", "Url", "read-things")]
+pub async fn read_things() -> Result<Vec<Thing>, leptos::ServerFnError> {
+    Ok(vec![
+        Thing::new("Hello 1 from backend".to_string()),
+        Thing::new("Hello 2 from backend".to_string()),
+        Thing::new("Hello 3 from backend".to_string()),
+    ])
 }
 
 #[debug_handler]
