@@ -101,9 +101,9 @@
             default = rec {
               args = buildArgs.common // {
                 doCheck = false;
-                
-                buildInputs = [ 
-                  pkgs.cargo-leptos 
+
+                buildInputs = [
+                  pkgs.cargo-leptos
                   pkgs.binaryen # Provides wasm-opt
                   tailwindcss
                 ];
