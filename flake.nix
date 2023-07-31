@@ -98,6 +98,25 @@
                 nativeBuildInputs = [ tailwindcss ];
               });
             };
+
+            default = rec {
+              cargoArtifacts = craneLib.buildDepsOnly (buildArgs.common // {
+                doCheck = false;
+              });
+              package = craneLib.buildPackage (buildArgs.common // {
+                inherit cargoArtifacts;
+                buildPhaseCargoCommand = "cargo leptos build --release -vvv";
+                installPhaseCommand = ''
+                  mkdir -p $out/bin
+                  cp target/server/x86_64-unknown-linux-gnu/release/leptos-fullstack $out/bin/
+                  cp -r target/site $out/bin/
+                '';
+                buildInputs = [ 
+                  pkgs.cargo-leptos 
+                  pkgs.binaryen # Provides wasm-opt
+                ];
+              });
+            };
           };
 
 
@@ -140,7 +159,7 @@
           packages = rec {
             backend = rustPackages.backend.package;
             frontend = rustPackages.frontend.package;
-            default = backend;
+            default = rustPackages.default.package;
           };
 
           # Rust dev environment
