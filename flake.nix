@@ -99,20 +99,25 @@
             };
 
             default = rec {
-              cargoArtifacts = craneLib.buildDepsOnly (buildArgs.common // {
+              args = buildArgs.common // {
                 doCheck = false;
-              });
-              package = craneLib.buildPackage (buildArgs.common // {
+                
+                buildInputs = [ 
+                  pkgs.cargo-leptos 
+                  pkgs.binaryen # Provides wasm-opt
+                  tailwindcss
+                ];
+              };
+              cargoArtifacts = craneLib.buildDepsOnly args;
+              package = craneLib.buildPackage (args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
                 installPhaseCommand = ''
                   mkdir -p $out/bin
-                  cp target/server/x86_64-unknown-linux-gnu/release/leptos-fullstack $out/bin/
+                  find target
+                  cp target/server/release/leptos-fullstack $out/bin/
                   cp -r target/site $out/bin/
                 '';
-                buildInputs = [ 
-                  pkgs.cargo-leptos 
-                  pkgs.binaryen # Provides wasm-opt
               });
             };
           };

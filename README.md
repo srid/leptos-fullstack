@@ -31,7 +31,7 @@ You can also `nix run` the app directly.
 ### Tech used
 
 - Nix + crane
-- https://trunkrs.dev/ (over `cargo-leptos`)
+- `cargo-leptos`
 - TailwindCSS
 
 ### Single-crate model
