@@ -58,9 +58,13 @@
             # wasm32 target, so we only build the client.
             wasm = common // {
               pname = "leptos-fullstack-wasm";
-              cargoExtraArgs = "--package=leptos-fullstack";
               CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
             };
+          };
+
+          cargoExtraArgs = {
+            frontend = "--features csr";
+            backend = "--features ssr";
           };
 
           rustPackages = rec {
@@ -71,7 +75,7 @@
               package = craneLib.buildPackage (buildArgs.native // {
                 pname = "leptos-fullstack";
                 inherit cargoArtifacts;
-                cargoExtraArgs = "--features ssr";
+                cargoExtraArgs = cargoExtraArgs.backend;
                 # The server needs to know where the client's dist dir is to
                 # serve it, so we pass it as an environment variable at build time
                 CLIENT_DIST = frontend.package;
@@ -86,7 +90,7 @@
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
                 inherit cargoArtifacts;
-                cargoExtraArgs = "--features csr";
+                cargoExtraArgs = cargoExtraArgs.frontend;
                 trunkIndexPath = "index.html";
                 buildInputs = [ tailwindcss ];
               });
@@ -164,7 +168,7 @@
                 name = "frontend-watch";
                 text = ''
                   set -x
-                  trunk serve --open
+                  trunk serve --open --features csr
                 '';
               });
               backend.command = lib.getExe (pkgs.writeShellApplication {
