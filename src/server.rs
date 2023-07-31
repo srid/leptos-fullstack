@@ -1,16 +1,17 @@
+use crate::thing::Thing;
 use axum::{
     routing::{get, post},
     Router,
 };
 use axum_macros::debug_handler;
-use leptos_fullstack_common::Thing;
 use std::net::SocketAddr;
 use tower_http::services::ServeDir;
 
-#[tokio::main]
-async fn main() {
+pub async fn main() {
+    let client_dist = ServeDir::new(env!("CLIENT_DIST"));
+    println!("Serving static files from {}", env!("CLIENT_DIST"));
     let app = Router::new()
-        .nest_service("/", ServeDir::new(env!("CLIENT_DIST")))
+        .nest_service("/", client_dist)
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .route("/hello", get(root));
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));

@@ -34,6 +34,9 @@
             src = ./.; # The original, unfiltered source
             filter = path: type:
               (lib.hasSuffix "\.html" path) ||
+              # Trunk assets
+              (lib.hasSuffix "Trunk.toml" path) ||
+              (lib.hasSuffix "tailwind.config.js" path) ||
               # Example of a folder for images, icons, etc
               (lib.hasInfix "/assets/" path) ||
               # Default filter from crane (allow .rs files)
@@ -58,9 +61,13 @@
             # wasm32 target, so we only build the client.
             wasm = common // {
               pname = "leptos-fullstack-wasm";
-              cargoExtraArgs = "--package=leptos-fullstack-frontend";
               CARGO_BUILD_TARGET = "wasm32-unknown-unknown";
             };
+          };
+
+          cargoExtraArgs = {
+            frontend = "--features csr";
+            backend = "--features ssr";
           };
 
           rustPackages = rec {
@@ -71,6 +78,7 @@
               package = craneLib.buildPackage (buildArgs.native // {
                 pname = "leptos-fullstack";
                 inherit cargoArtifacts;
+                cargoExtraArgs = cargoExtraArgs.backend;
                 # The server needs to know where the client's dist dir is to
                 # serve it, so we pass it as an environment variable at build time
                 CLIENT_DIST = frontend.package;
@@ -85,16 +93,19 @@
               # This derivation is a directory you can put on a webserver.
               package = craneLib.buildTrunkPackage (buildArgs.wasm // {
                 inherit cargoArtifacts;
-                trunkIndexPath = "frontend/index.html";
+                trunkExtraBuildArgs = cargoExtraArgs.frontend;
+                trunkIndexPath = "index.html";
+                nativeBuildInputs = [ tailwindcss ];
               });
             };
           };
+
 
           rustDevShell = pkgs.mkShell {
             shellHook = ''
               # For rust-analyzer 'hover' tooltips to work.
               export RUST_SRC_PATH="${rustToolchain}/lib/rustlib/src/rust/library";
-              export CLIENT_DIST=$PWD/frontend/dist;
+              export CLIENT_DIST=$PWD/dist;
             '';
             buildInputs = [
               pkgs.libiconv
@@ -105,6 +116,17 @@
               trunk
             ];
           };
+
+          tailwindcss = pkgs.nodePackages.tailwindcss.overrideAttrs
+            (oa: {
+              plugins = [
+                pkgs.nodePackages."@tailwindcss/aspect-ratio"
+                pkgs.nodePackages."@tailwindcss/forms"
+                pkgs.nodePackages."@tailwindcss/language-server"
+                pkgs.nodePackages."@tailwindcss/line-clamp"
+                pkgs.nodePackages."@tailwindcss/typography"
+              ];
+            });
         in
         {
           _module.args.pkgs = import inputs.nixpkgs {
@@ -130,16 +152,7 @@
             nativeBuildInputs = with pkgs; [
               just
               config.proc.groups.watch-project.package
-              (pkgs.nodePackages.tailwindcss.overrideAttrs
-                (oa: {
-                  plugins = [
-                    pkgs.nodePackages."@tailwindcss/aspect-ratio"
-                    pkgs.nodePackages."@tailwindcss/forms"
-                    pkgs.nodePackages."@tailwindcss/language-server"
-                    pkgs.nodePackages."@tailwindcss/line-clamp"
-                    pkgs.nodePackages."@tailwindcss/typography"
-                  ];
-                }))
+              tailwindcss
             ];
           };
 
@@ -159,16 +172,14 @@
                 name = "frontend-watch";
                 text = ''
                   set -x
-                  cd ./frontend
-                  trunk serve --open
+                  trunk serve --open ${cargoExtraArgs.frontend}
                 '';
               });
               backend.command = lib.getExe (pkgs.writeShellApplication {
                 name = "backend-watch";
                 text = ''
                   set -x
-                  cd ./backend
-                  cargo watch -x run
+                  cargo watch -x run  ${cargoExtraArgs.backend}
                 '';
               });
             };
