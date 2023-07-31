@@ -153,6 +153,7 @@
               just
               config.proc.groups.watch-project.package
               tailwindcss
+              cargo-leptos
             ];
           };
 
