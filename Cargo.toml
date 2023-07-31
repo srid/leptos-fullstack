@@ -28,6 +28,7 @@ axum = { version = "0.6", features = ["json", "tokio"], optional = true }
 axum-macros = { version = "0.3", optional = true }
 tokio = { version = "1.29", features = ["full"], optional = true }
 tower-http = { version = "0.4", features = ["full"], optional = true }
+tower = { version = "0.4", optional = true }
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -38,6 +39,7 @@ ssr = [
     "dep:leptos_axum",
     "dep:axum",
     "dep:tokio",
+    "dep:tower",
     "dep:tower-http",
     "dep:axum-macros",
 ]

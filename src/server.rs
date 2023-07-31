@@ -1,4 +1,5 @@
 use crate::app::App;
+use crate::fileserv::file_and_error_handler;
 use crate::thing::Thing;
 use axum::{
     routing::{get, post},
@@ -14,10 +15,10 @@ pub async fn main() {
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(|cx| view! { cx, <App/> }).await;
     let app = Router::new()
+        .route("/hello", get(root))
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .leptos_routes(&leptos_options, routes, |cx| view! { cx, <App/> })
-        // .nest_service("/", client_dist)
-        .route("/hello", get(root))
+        .fallback(file_and_error_handler)
         .with_state(leptos_options);
     println!("Launching http://{}", &addr);
     axum::Server::bind(&addr)
