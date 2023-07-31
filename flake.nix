@@ -17,7 +17,6 @@
       systems = import inputs.systems;
       imports = [
         inputs.treefmt-nix.flakeModule
-        inputs.proc-flake.flakeModule
         inputs.flake-root.flakeModule
       ];
       perSystem = { config, self', pkgs, lib, system, ... }:
@@ -114,7 +113,6 @@
                 buildInputs = [ 
                   pkgs.cargo-leptos 
                   pkgs.binaryen # Provides wasm-opt
-                ];
               });
             };
           };
@@ -156,9 +154,7 @@
           };
 
           # Rust package
-          packages = rec {
-            backend = rustPackages.backend.package;
-            frontend = rustPackages.frontend.package;
+          packages = {
             default = rustPackages.default.package;
           };
 
@@ -170,7 +166,6 @@
             ];
             nativeBuildInputs = with pkgs; [
               just
-              config.proc.groups.watch-project.package
               tailwindcss
               cargo-leptos
             ];
@@ -183,25 +178,6 @@
             programs = {
               nixpkgs-fmt.enable = true;
               rustfmt.enable = true;
-            };
-          };
-
-          proc.groups.watch-project = {
-            processes = {
-              frontend.command = lib.getExe (pkgs.writeShellApplication {
-                name = "frontend-watch";
-                text = ''
-                  set -x
-                  trunk serve --open ${cargoExtraArgs.frontend}
-                '';
-              });
-              backend.command = lib.getExe (pkgs.writeShellApplication {
-                name = "backend-watch";
-                text = ''
-                  set -x
-                  cargo watch -x run  ${cargoExtraArgs.backend}
-                '';
-              });
             };
           };
         };
