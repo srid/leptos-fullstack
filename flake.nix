@@ -33,7 +33,10 @@
           src = lib.cleanSourceWith {
             src = ./.; # The original, unfiltered source
             filter = path: type:
-              (lib.hasSuffix "\.html" path) ||
+              (lib.hasSuffix "\.html" (builtins.trace path path)) ||
+              # Trunk assets
+              (lib.hasSuffix "Trunk.toml" path) ||
+              (lib.hasSuffix "tailwind.config.js" path) ||
               # Example of a folder for images, icons, etc
               (lib.hasInfix "/assets/" path) ||
               # Default filter from crane (allow .rs files)
@@ -92,10 +95,11 @@
                 inherit cargoArtifacts;
                 trunkExtraBuildArgs = cargoExtraArgs.frontend;
                 trunkIndexPath = "index.html";
-                buildInputs = [ tailwindcss ];
+                nativeBuildInputs = [ tailwindcss ];
               });
             };
           };
+
 
           rustDevShell = pkgs.mkShell {
             shellHook = ''
