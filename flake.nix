@@ -33,7 +33,7 @@
           src = lib.cleanSourceWith {
             src = ./.; # The original, unfiltered source
             filter = path: type:
-              (lib.hasSuffix "\.html" (builtins.trace path path)) ||
+              (lib.hasSuffix "\.html" path) ||
               # Trunk assets
               (lib.hasSuffix "Trunk.toml" path) ||
               (lib.hasSuffix "tailwind.config.js" path) ||
