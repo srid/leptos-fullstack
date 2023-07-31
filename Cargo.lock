@@ -149,6 +149,7 @@ checksum = "a6a1de45611fdb535bfde7b7de4fd54f4fd2b17b1737c0a59b69bf9b92074b8c"
 dependencies = [
  "async-trait",
  "axum-core",
+ "axum-macros",
  "bitflags 1.3.2",
  "bytes",
  "futures-util",
@@ -1049,6 +1050,7 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "leptos",
+ "leptos_axum",
  "leptos_meta",
  "leptos_router",
  "log",
@@ -1058,6 +1060,28 @@ dependencies = [
  "tower-http",
  "uuid",
  "wasm-bindgen",
+]
+
+[[package]]
+name = "leptos_axum"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7792adaf3e74cefd5d547d4c3adcdd72b68ce16c5447254a995928b4ab242198"
+dependencies = [
+ "axum",
+ "futures",
+ "http",
+ "hyper",
+ "leptos",
+ "leptos_integration_utils",
+ "leptos_meta",
+ "leptos_router",
+ "once_cell",
+ "parking_lot",
+ "serde_json",
+ "tokio",
+ "tokio-util",
+ "tracing",
 ]
 
 [[package]]
@@ -1119,6 +1143,20 @@ dependencies = [
  "serde",
  "syn 2.0.28",
  "walkdir",
+]
+
+[[package]]
+name = "leptos_integration_utils"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "edd31324756c9c6903218abafa43483d3d5d1b057387822aaa4ba15aae5c9375"
+dependencies = [
+ "futures",
+ "leptos",
+ "leptos_config",
+ "leptos_hot_reload",
+ "leptos_meta",
+ "tracing",
 ]
 
 [[package]]
@@ -2083,6 +2121,8 @@ dependencies = [
  "bytes",
  "futures-core",
  "futures-sink",
+ "futures-util",
+ "hashbrown 0.12.3",
  "pin-project-lite",
  "tokio",
  "tracing",

@@ -3,6 +3,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
+#[cfg(not(feature = "ssr"))]
 pub fn main() {
     _ = console_log::init_with_level(log::Level::Debug);
     console_error_panic_hook::set_once();
