@@ -88,7 +88,7 @@ fn Counter(cx: Scope) -> impl IntoView {
 
     view! { cx,
         <div class="mx-auto my-8 text-center md:container">
-            <h1 class="mb-4 text-3xl font-bold text-pink-500">"Leptops Counter"</h1>
+            <Header2 text="Leptops Counter" />
             <button
                 class="p-4 border-2 rounded-full shadow-lg active:shadow-none bg-blue-50 hover:bg-blue-200 active:bg-blue-500"
                 on:click=on_click>"Click Me: " {count}</button>
