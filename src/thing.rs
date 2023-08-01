@@ -21,7 +21,7 @@ impl Thing {
     }
 }
 
-#[server(ReadThings, "/api", "Url", "read_things")]
+#[server(ReadThings, "/api")]
 pub async fn read_things() -> Result<Vec<Thing>, leptos::ServerFnError> {
     Ok(vec![
         Thing::new("Hello 1 from backend".to_string()),
