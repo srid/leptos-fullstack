@@ -47,7 +47,7 @@
               inherit src;
               pname = cargoToml.package.name;
               version = cargoToml.package.version;
-              # SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
+              # SERVER_FN_OVERRIDE_KEY = cargoToml.package.name; # for server_fn to use consistent hash, independent of nix build paths
             };
           };
 

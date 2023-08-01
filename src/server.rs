@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::fileserv::file_and_error_handler;
-use crate::thing::Thing;
+use crate::thing::{ReadThings, Thing};
 use axum::{
     routing::{get, post},
     Router,
@@ -21,6 +21,7 @@ pub async fn main() {
         .fallback(file_and_error_handler)
         .with_state(leptos_options);
     println!("Launching http://{}", &addr);
+    println!("fn_url: {}", ReadThings::url());
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await

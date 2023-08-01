@@ -1,4 +1,4 @@
-use crate::thing::{read_things, Thing};
+use crate::thing::{read_things, ReadThings, Thing};
 use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
@@ -31,6 +31,7 @@ fn Home(cx: Scope) -> impl IntoView {
                     <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
                     <pre>{thing.browser_view()}</pre>
                     <Header2 text="Backend" />
+                    <pre>fn_url: {ReadThings::url()}</pre>
                     {move || {
                         things.read(cx)
                             .map(move |things| match things {
