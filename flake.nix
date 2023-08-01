@@ -34,6 +34,18 @@
             rustfmt.enable = true;
           };
         };
+
+        packages.default = self'.packages.leptos-fullstack;
+
+        devShells.default = pkgs.mkShell {
+          inputsFrom = [
+            config.treefmt.build.devShell
+            self'.devShells.leptos-fullstack
+          ];
+          nativeBuildInputs = with pkgs; [
+            just
+          ];
+        };
       };
     };
 }

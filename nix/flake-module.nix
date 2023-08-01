@@ -11,14 +11,11 @@ in
   options = {
     perSystem = mkPerSystemOption
       ({ config, self', inputs', pkgs, system, ... }: {
-        options.leptos-app = mkOption {
-          type = types.attrsOf types.any;
-          default = { };
-          description = "Configuration for the Leptos app";
-        };
         config =
           let
             cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
+            inherit (cargoToml.package) name version;
+
             rustToolchain = (pkgs.rust-bin.fromRustupToolchainFile (self + /rust-toolchain.toml)).override {
               extensions = [
                 "rust-src"
@@ -26,6 +23,7 @@ in
               ];
             };
             craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
+
             # When filtering sources, we want to allow assets other than .rs files
             src = lib.cleanSourceWith {
               src = self; # The original, unfiltered source
@@ -43,9 +41,9 @@ in
               default = rec {
                 args = {
                   inherit src;
-                  pname = cargoToml.package.name;
-                  version = cargoToml.package.version;
-                  doCheck = false;
+                  pname = name;
+                  version = version;
+                  doCheck = false; # TODO why?
                   buildInputs = [
                     pkgs.cargo-leptos
                     pkgs.binaryen # Provides wasm-opt
@@ -61,9 +59,9 @@ in
                   ];
                   installPhaseCommand = ''
                     mkdir -p $out/bin
-                    cp target/server/release/${cargoToml.package.name} $out/bin/
+                    cp target/server/release/${name} $out/bin/
                     cp -r target/site $out/bin/
-                    wrapProgram $out/bin/${cargoToml.package.name} \
+                    wrapProgram $out/bin/${name} \
                       --set LEPTOS_SITE_ROOT $out/bin/site
                   '';
                 });
@@ -79,9 +77,8 @@ in
               buildInputs = [
                 pkgs.libiconv
               ];
-              nativeBuildInputs = with pkgs; [
+              nativeBuildInputs = [
                 rustToolchain
-                cargo-watch
               ];
             };
 
@@ -98,18 +95,14 @@ in
           in
           {
             # Rust package
-            packages = {
-              default = rustPackages.default.package;
-            };
+            packages.${name} = rustPackages.default.package;
 
             # Rust dev environment
-            devShells.default = pkgs.mkShell {
+            devShells.${name} = pkgs.mkShell {
               inputsFrom = [
-                config.treefmt.build.devShell
                 rustDevShell
               ];
               nativeBuildInputs = with pkgs; [
-                just
                 tailwindcss
                 cargo-leptos
                 binaryen # Provides wasm-opt
