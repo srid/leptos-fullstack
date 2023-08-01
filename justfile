@@ -7,5 +7,4 @@ fmt:
 
 # Run the project locally
 watch *ARGS:
-    rm -rf ./dist
-    watch-project
+    cargo leptos watch
