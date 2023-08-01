@@ -5,6 +5,8 @@ use leptos_router::*;
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
+    leptos::log!("where do I run?");
+
     provide_meta_context(cx);
 
     view! {
@@ -24,7 +26,7 @@ fn Home(cx: Scope) -> impl IntoView {
     let things = create_local_resource(cx, move || (), move |_| read_things());
     view! { cx,
         <div class="flex flex-col items-center justify-center min-h-screen bg-red-600">
-            <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg ">
+            <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg">
                 <Header1 text="Welcome to leptos-fullstack template" />
                 <div class="items-left">
                     <Header2 text="Frontend" />
@@ -34,19 +36,24 @@ fn Home(cx: Scope) -> impl IntoView {
                     <pre>fn_url: {ReadThings::url()}</pre>
                     {move || {
                         things.read(cx)
-                            .map(move |things| match things {
-                                Err(e) => {
-                                view! { cx, <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">"Server Error: " {e.to_string()}</pre>}.into_view(cx)
-                                }
-                                Ok(things) => {
-                                    things.into_iter().map(move |thing| {
-                                        view! {
-                                            cx,
-                                            <li>{thing.browser_view()}</li>
-                                        }
-                                    }).collect_view(cx)
-                                }
-                            })
+                            .map(move |things| {
+                                log!("things: {:?}", things);
+                                match things {
+                                    Err(e) => {
+                                        view! { cx, <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">"Server Error: " {e.to_string()}</pre>}.into_view(cx)
+                                    }
+                                    Ok(things) => {
+                                        log!("Ok");
+                                        things.into_iter().map(move |thing| {
+                                            log!("thing: {:?}", thing);
+                                            view! {
+                                                cx,
+                                                <li>{log!("bv"); thing.browser_view()}</li>
+                                            }
+                                        }).collect_view(cx)
+                                    }
+                            }
+                        })
                     }}
                     <Link link="/hello" text="request backend /hello API" />
                     <Counter />
