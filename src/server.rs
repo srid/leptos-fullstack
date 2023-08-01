@@ -1,6 +1,7 @@
 use crate::app::App;
 use crate::thing::{ReadThings, Thing};
 use axum::http::StatusCode;
+use axum::response::Response as AxumResponse;
 use axum::{
     body::Body,
     extract::State,
@@ -42,7 +43,6 @@ pub async fn main() {
         .await
         .unwrap();
 }
-use axum::response::Response as AxumResponse;
 
 pub async fn error_handler(
     _uri: Uri,
