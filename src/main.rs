@@ -1,7 +1,5 @@
 mod app;
 #[cfg(feature = "ssr")]
-mod fileserv;
-#[cfg(feature = "ssr")]
 mod server;
 mod thing;
 
