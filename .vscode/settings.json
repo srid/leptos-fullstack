@@ -1,5 +1,6 @@
 {
     "nixEnvSelector.nixFile": "${workspaceRoot}/shell.nix",
+    "rust-analyzer.cargo.features": "all",
     "editor.formatOnSave": true,
     // https://twitter.com/sridca/status/1674947342607216641
     "editor.inlayHints.enabled": "offUnlessPressed"
