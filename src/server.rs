@@ -14,12 +14,12 @@ pub async fn main() {
     let leptos_options = conf.leptos_options;
     let addr = leptos_options.site_addr;
     let routes = generate_route_list(|cx| view! { cx, <App/> }).await;
-    let client_dist = ServeDir::new(format!("{}/pkg", leptos_options.site_root.clone()));
+    let client_dist = ServeDir::new(leptos_options.site_root.clone());
     let app = Router::new()
         .route("/hello", get(root))
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         .leptos_routes(&leptos_options, routes, |cx| view! { cx, <App/> })
-        .nest_service("/pkg", client_dist)
+        .fallback_service(client_dist)
         .with_state(leptos_options);
     println!("Launching http://{}", &addr);
     println!("fn_url: {}", ReadThings::url());

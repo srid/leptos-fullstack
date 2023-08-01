@@ -56,6 +56,7 @@ panic = "abort"
 site-addr = "127.0.0.1:3000"
 style-file = "css/output.css"
 tailwind-input-file = "css/output.css"
+assets-dir = "assets"
 bin-features = ["ssr"]
 lib-features = ["hydrate"]
 # The profile to use for the lib target when compiling for release
