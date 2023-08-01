@@ -37,37 +37,34 @@ in
               ;
             };
 
-            rustPackages = {
-              default = rec {
-                args = {
-                  inherit src;
-                  pname = name;
-                  version = version;
-                  doCheck = false; # TODO why?
-                  buildInputs = [
-                    pkgs.cargo-leptos
-                    pkgs.binaryen # Provides wasm-opt
-                    tailwindcss
-                  ];
-                };
-                cargoArtifacts = craneLib.buildDepsOnly args;
-                package = craneLib.buildPackage (args // {
-                  inherit cargoArtifacts;
-                  buildPhaseCargoCommand = "cargo leptos build --release -vvv";
-                  nativeBuildInputs = [
-                    pkgs.makeWrapper
-                  ];
-                  installPhaseCommand = ''
-                    mkdir -p $out/bin
-                    cp target/server/release/${name} $out/bin/
-                    cp -r target/site $out/bin/
-                    wrapProgram $out/bin/${name} \
-                      --set LEPTOS_SITE_ROOT $out/bin/site
-                  '';
-                });
+            craneBuild = rec {
+              args = {
+                inherit src;
+                pname = name;
+                version = version;
+                buildInputs = [
+                  pkgs.cargo-leptos
+                  pkgs.binaryen # Provides wasm-opt
+                  tailwindcss
+                ];
               };
+              cargoArtifacts = craneLib.buildDepsOnly args;
+              package = craneLib.buildPackage (args // {
+                inherit cargoArtifacts;
+                buildPhaseCargoCommand = "cargo leptos build --release -vvv";
+                doCheck = false; # FIXME: https://github.com/benwis/benwis_leptos/issues/2
+                nativeBuildInputs = [
+                  pkgs.makeWrapper
+                ];
+                installPhaseCommand = ''
+                  mkdir -p $out/bin
+                  cp target/server/release/${name} $out/bin/
+                  cp -r target/site $out/bin/
+                  wrapProgram $out/bin/${name} \
+                    --set LEPTOS_SITE_ROOT $out/bin/site
+                '';
+              });
             };
-
 
             rustDevShell = pkgs.mkShell {
               shellHook = ''
@@ -95,7 +92,7 @@ in
           in
           {
             # Rust package
-            packages.${name} = rustPackages.default.package;
+            packages.${name} = craneBuild.package;
 
             # Rust dev environment
             devShells.${name} = pkgs.mkShell {

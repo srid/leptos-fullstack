@@ -28,6 +28,12 @@ nix build
 
 You can also `nix run` the app directly.
 
+## Using as flake-parts module
+
+Import `this flake + /nix/flake-module.nix` as a flake-parts module.
+
+In future, we might create a standalone flake-parts module for Leptos.
+
 ## Notes
 
 ### Single-crate model
