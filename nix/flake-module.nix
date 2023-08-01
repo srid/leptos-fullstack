@@ -32,6 +32,7 @@ in
                 (lib.hasSuffix "tailwind.config.js" path) ||
                 # Example of a folder for images, icons, etc
                 (lib.hasInfix "/assets/" path) ||
+                (lib.hasInfix "/css/" path) ||
                 # Default filter from crane (allow .rs files)
                 (craneLib.filterCargoSources path type)
               ;

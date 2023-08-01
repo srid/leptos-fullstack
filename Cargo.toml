@@ -54,8 +54,8 @@ panic = "abort"
 
 [package.metadata.leptos]
 site-addr = "127.0.0.1:3000"
-style-file = "assets/css/output.css"
-tailwind-input-file = "assets/css/output.css"
+style-file = "css/output.css"
+tailwind-input-file = "css/output.css"
 bin-features = ["ssr"]
 lib-features = ["hydrate"]
 # The profile to use for the lib target when compiling for release
