@@ -1,9 +1,9 @@
 mod app;
 mod thing;
-#[cfg(not(feature = "ssr"))]
+#[cfg(feature = "hydrate")]
 use wasm_bindgen::prelude::wasm_bindgen;
 
-#[cfg(not(feature = "ssr"))]
+#[cfg(feature = "hydrate")]
 #[wasm_bindgen]
 pub fn hydrate() {
     use crate::app::*;
