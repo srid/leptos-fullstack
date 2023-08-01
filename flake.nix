@@ -39,21 +39,13 @@
             ;
           };
 
-          buildArgs = {
-            # Arguments to be used by both the client and the server
-            # When building a workspace with crane, it's a good idea
-            # to set "pname" and "version".
-            common = {
-              inherit src;
-              pname = cargoToml.package.name;
-              version = cargoToml.package.version;
-              # SERVER_FN_OVERRIDE_KEY = cargoToml.package.name; # for server_fn to use consistent hash, independent of nix build paths
-            };
-          };
-
           rustPackages = {
             default = rec {
-              args = buildArgs.common // {
+              args = {
+                inherit src;
+                pname = cargoToml.package.name;
+                version = cargoToml.package.version;
+                # SERVER_FN_OVERRIDE_KEY = cargoToml.package.name; # for server_fn to use consistent hash, independent of nix build paths
                 doCheck = false;
                 buildInputs = [
                   pkgs.cargo-leptos
