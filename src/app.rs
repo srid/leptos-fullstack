@@ -5,8 +5,6 @@ use leptos_router::*;
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
-    leptos::log!("where do I run?");
-
     provide_meta_context(cx);
 
     view! {
@@ -43,12 +41,10 @@ fn Home(cx: Scope) -> impl IntoView {
                                         view! { cx, <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">"Server Error: " {e.to_string()}</pre>}.into_view(cx)
                                     }
                                     Ok(things) => {
-                                        log!("Ok");
                                         things.into_iter().map(move |thing| {
-                                            log!("thing: {:?}", thing);
                                             view! {
                                                 cx,
-                                                <li>{log!("bv"); thing.browser_view()}</li>
+                                                <li>{thing.browser_view()}</li>
                                             }
                                         }).collect_view(cx)
                                     }
