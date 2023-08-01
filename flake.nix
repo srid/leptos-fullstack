@@ -18,6 +18,7 @@
       ];
       perSystem = { config, self', pkgs, lib, system, ... }:
         let
+          cargoToml = builtins.fromTOML (builtins.readFile ./Cargo.toml);
           rustToolchain = (pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml).override {
             extensions = [
               "rust-src"
@@ -44,8 +45,8 @@
             # to set "pname" and "version".
             common = {
               inherit src;
-              pname = "leptos-fullstack";
-              version = "0.1.0";
+              pname = cargoToml.package.name;
+              version = cargoToml.package.version;
               # SERVER_FN_OVERRIDE_KEY = "srid"; # for server_fn to use consistent hash, independent of nix build paths
             };
           };
@@ -66,7 +67,7 @@
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
                 installPhaseCommand = ''
                   mkdir -p $out/bin
-                  cp target/server/release/leptos-fullstack $out/bin/
+                  cp target/server/release/${cargoToml.package.name} $out/bin/
                   cp -r target/site $out/bin/
                 '';
               });
