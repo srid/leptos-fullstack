@@ -57,10 +57,15 @@
               package = craneLib.buildPackage (args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
+                nativeBuildInputs = [
+                  pkgs.makeWrapper
+                ];
                 installPhaseCommand = ''
                   mkdir -p $out/bin
                   cp target/server/release/${cargoToml.package.name} $out/bin/
                   cp -r target/site $out/bin/
+                  wrapProgram $out/bin/${cargoToml.package.name} \
+                    --set LEPTOS_SITE_ROOT $out/bin/site
                 '';
               });
             };
