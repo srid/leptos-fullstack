@@ -1,18 +1,18 @@
 # leptos-fullstack
 
-
 > [!WARNING] 
-> Work in progress!
+> Work in progress
 
-Tech used,
+A template for full-stack Rust apps using Leptos. Tech used:
 
-- Nix + crane
-- `cargo-leptos` for build
-- Axum for backend server
-- Leptos
+- [Leptos](https://leptos.dev/) full-stack framework 
     - [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
     - [ssr + hydration](https://leptos-rs.github.io/leptos/ssr/index.html)
-- TailwindCSS
+- [Axum](https://github.com/tokio-rs/axum) for backend server
+- [Tailwind CSS](https://tailwindcss.com/)
+- Build system
+  - `cargo-leptos`
+  - [Nix Flakes](https://zero-to-flakes.com/) + [crane](https://github.com/ipetkov/crane)
 
 ## Running locally
 
