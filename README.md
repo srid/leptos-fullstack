@@ -1,22 +1,18 @@
 # leptos-fullstack
 
+
+> [!WARNING] 
+> Work in progress!
+
 Tech used,
 
 - Nix + crane
-- `cargo-leptos`
+- `cargo-leptos` for build
+- Axum for backend server
+- Leptos
+    - [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
+    - [ssr + hydration](https://leptos-rs.github.io/leptos/ssr/index.html)
 - TailwindCSS
-
-WIP
-
-- [x] use nightly
-- [x] use axum
-- [x] do vanilla wasm + trunk
-    - [x] `nix build` must work
-- [x] leptos integrate
-- [x] tailwind
-- final
-    - [x] [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html)
-    - [ ] [ssr](https://leptos-rs.github.io/leptos/ssr/index.html)
 
 ## Running locally
 
