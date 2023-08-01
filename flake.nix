@@ -115,6 +115,7 @@
               just
               tailwindcss
               cargo-leptos
+              binaryen # Provides wasm-opt
             ];
           };
 
