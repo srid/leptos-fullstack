@@ -38,3 +38,7 @@ In future, we might create a standalone flake-parts module for Leptos.
 ### Single-crate model
 
 This repo uses the single-crate model  primarily because the backend-common-frontend split (prior to PR #5; similar to [start-axum-workspace](https://github.com/leptos-rs/start-axum-workspace) template) is not suitable when using [server functions](https://docs.rs/leptos/latest/leptos/attr.server.html) in leptos. Consequently, expect a bunch of `cfg` attributes or macros that make backend-only code conditional upon the `ssr` flag (which is set when compiling the crate for backend, as opposed to wasm frontend, which uses `csr`)
+
+## Credits
+
+The Rust code is largely based on [start-axum](https://github.com/leptos-rs/start-axum). Also, credit goes [to @benwis](https://github.com/benwis/benwis_leptos/blob/928ea7e7c20a86be91ad27e75cf297a2fbef681d/flake.nix#L148-L153) for pointers to how crane can be made to work with cargo-leptos.
