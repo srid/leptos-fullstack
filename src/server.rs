@@ -1,13 +1,10 @@
+use std::convert::Infallible;
+
 use crate::app::App;
 use crate::thing::{ReadThings, Thing};
 use axum::http::StatusCode;
 use axum::response::Response as AxumResponse;
-use axum::{
-    body::Body,
-    extract::State,
-    http::{Request, Uri},
-    response::IntoResponse,
-};
+use axum::{body::Body, http::Request, response::IntoResponse};
 use axum::{
     routing::{get, post},
     Router,
@@ -19,40 +16,42 @@ use tower_http::services::ServeDir;
 
 pub async fn main() {
     let conf = get_configuration(None).await.unwrap();
-    let leptos_options = conf.leptos_options;
-    let addr = leptos_options.site_addr;
     let routes = generate_route_list(|cx| view! { cx, <App/> }).await;
-    let client_dist = ServeDir::new(leptos_options.site_root.clone());
+    let client_dist = ServeDir::new(conf.leptos_options.site_root.clone());
+    let leptos_options = conf.leptos_options.clone(); // A copy to move to the closure below.
+    let error_handler_service =
+        tower::service_fn(move |req| error_handler(leptos_options.to_owned(), req));
     let app = Router::new()
         // custom routes
         .route("/hello", get(root))
         // server functions API routes
         .route("/api/*fn_name", post(leptos_axum::handle_server_fns))
         // application routes
-        .leptos_routes(&leptos_options, routes, |cx| view! { cx, <App/> })
-        // when none of the routes match the requested URL
-        .fallback(error_handler)
+        .leptos_routes(&conf.leptos_options, routes, |cx| view! { cx, <App/> })
         // static files are served as fallback (but *before* falling back to
         // error handler)
-        .fallback_service(client_dist.clone())
-        .with_state(leptos_options);
-    println!("Launching http://{}", &addr);
+        .fallback_service(client_dist.clone().not_found_service(error_handler_service))
+        .with_state(conf.leptos_options.clone());
+    println!("Launching http://{}", &conf.leptos_options.site_addr);
     println!("fn_url: {}", ReadThings::url());
-    axum::Server::bind(&addr)
+    axum::Server::bind(&conf.leptos_options.site_addr)
         .serve(app.into_make_service())
         .await
         .unwrap();
 }
 
+// Handle 404s and application errors
 pub async fn error_handler(
-    _uri: Uri,
-    State(options): State<LeptosOptions>,
+    _options: LeptosOptions,
     _req: Request<Body>,
-) -> AxumResponse {
+) -> Result<AxumResponse, Infallible> {
     // TODO: Let app render error page
-    let _handler =
+    /*
+    let handler =
         leptos_axum::render_app_to_stream(options.to_owned(), move |cx| view! {cx, <App/>});
-    (StatusCode::NOT_FOUND, "'tis not found").into_response()
+    Ok(handler(req).await.into_response())
+    */
+    Ok((StatusCode::NOT_FOUND, "'tis not found").into_response())
 }
 
 #[debug_handler]
