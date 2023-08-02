@@ -1,5 +1,10 @@
 use crate::thing::{read_things, ReadThings, Thing};
+use cfg_if::cfg_if;
+#[cfg(feature = "ssr")]
+use http::status::StatusCode;
 use leptos::*;
+#[cfg(feature = "ssr")]
+use leptos_axum::ResponseOptions;
 use leptos_meta::*;
 use leptos_router::*;
 
@@ -10,7 +15,14 @@ pub fn App(cx: Scope) -> impl IntoView {
     view! {
         cx,
         <Stylesheet id="leptos" href="/pkg/leptos-fullstack.css"/>
-        <Router>
+        <Router fallback=|cx| {
+            cfg_if! { if #[cfg(feature="ssr")] {
+                if let Some(response) = use_context::<ResponseOptions>(cx) {
+                    response.set_status(StatusCode::NOT_FOUND);
+                }
+            }}
+            view! { cx, <NotFound /> }.into_view(cx)
+        }>
             <Routes>
                 <Route path="" view=  move |cx| view! { cx, <Home/> }/>
             </Routes>
@@ -51,7 +63,8 @@ fn Home(cx: Scope) -> impl IntoView {
                             }
                         })
                     }}
-                    <Link link="/hello" text="request backend /hello API" />
+                    <Link link="/hello" text="request backend /hello API" rel="external" />
+                    <div><Link link="/sdf" text="broken link" /></div>
                     <Counter />
                 </div>
             </div>
@@ -60,9 +73,14 @@ fn Home(cx: Scope) -> impl IntoView {
 }
 
 #[component]
-fn Link(cx: Scope, link: &'static str, text: &'static str) -> impl IntoView {
+fn Link(
+    cx: Scope,
+    link: &'static str,
+    text: &'static str,
+    #[prop(optional)] rel: Option<&'static str>,
+) -> impl IntoView {
     view! {cx,
-        <a href=link target="_blank" class="text-red-500 underline hover:no-underline">{text}</a>
+        <a href=link class="text-red-500 underline hover:no-underline" rel=rel>{text}</a>
     }
 }
 
@@ -76,6 +94,15 @@ fn Header1(cx: Scope, text: &'static str) -> impl IntoView {
 fn Header2(cx: Scope, text: &'static str) -> impl IntoView {
     view! {cx,
         <h2 class="my-2 text-2xl font-bold text-gray-600">{text}</h2>
+    }
+}
+
+#[component]
+fn NotFound(cx: Scope) -> impl IntoView {
+    view! { cx,
+        <div class="flex flex-row justify-center text-3xl text-red-500">
+            "404: Page not found"
+        </div>
     }
 }
 

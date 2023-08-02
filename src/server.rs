@@ -2,7 +2,6 @@ use std::convert::Infallible;
 
 use crate::app::App;
 use crate::thing::{ReadThings, Thing};
-use axum::http::StatusCode;
 use axum::response::Response as AxumResponse;
 use axum::{body::Body, http::Request, response::IntoResponse};
 use axum::{
@@ -19,8 +18,8 @@ pub async fn main() {
     let routes = generate_route_list(|cx| view! { cx, <App/> }).await;
     let client_dist = ServeDir::new(conf.leptos_options.site_root.clone());
     let leptos_options = conf.leptos_options.clone(); // A copy to move to the closure below.
-    let error_handler_service =
-        tower::service_fn(move |req| error_handler(leptos_options.to_owned(), req));
+    let not_found_service =
+        tower::service_fn(move |req| not_found_handler(leptos_options.to_owned(), req));
     let app = Router::new()
         // custom routes
         .route("/hello", get(root))
@@ -30,7 +29,7 @@ pub async fn main() {
         .leptos_routes(&conf.leptos_options, routes, |cx| view! { cx, <App/> })
         // static files are served as fallback (but *before* falling back to
         // error handler)
-        .fallback_service(client_dist.clone().not_found_service(error_handler_service))
+        .fallback_service(client_dist.clone().not_found_service(not_found_service))
         .with_state(conf.leptos_options.clone());
     println!("Launching http://{}", &conf.leptos_options.site_addr);
     println!("fn_url: {}", ReadThings::url());
@@ -40,18 +39,15 @@ pub async fn main() {
         .unwrap();
 }
 
-// Handle 404s and application errors
-pub async fn error_handler(
-    _options: LeptosOptions,
-    _req: Request<Body>,
+// On missing routes, just delegate to the leptos app, which has a route
+// fallback rendering 404 response.
+pub async fn not_found_handler(
+    options: LeptosOptions,
+    req: Request<Body>,
 ) -> Result<AxumResponse, Infallible> {
-    // TODO: Let app render error page
-    /*
     let handler =
         leptos_axum::render_app_to_stream(options.to_owned(), move |cx| view! {cx, <App/>});
     Ok(handler(req).await.into_response())
-    */
-    Ok((StatusCode::NOT_FOUND, "'tis not found").into_response())
 }
 
 #[debug_handler]

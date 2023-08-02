@@ -29,6 +29,7 @@ axum-macros = { version = "0.3", optional = true }
 tokio = { version = "1.29", features = ["full"], optional = true }
 tower-http = { version = "0.4", features = ["full"], optional = true }
 tower = { version = "0.4", optional = true }
+http = { version = "0.2", optional = true }
 
 [features]
 hydrate = ["leptos/hydrate", "leptos_meta/hydrate", "leptos_router/hydrate"]
@@ -42,6 +43,7 @@ ssr = [
     "dep:tower",
     "dep:tower-http",
     "dep:axum-macros",
+    "dep:http",
 ]
 
 # Defines a size-optimized profile for the WASM bundle in release mode
