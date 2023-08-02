@@ -56,8 +56,7 @@ panic = "abort"
 
 [package.metadata.leptos]
 site-addr = "127.0.0.1:3000"
-style-file = "css/output.css"
-tailwind-input-file = "css/output.css"
+tailwind-input-file = "css/input.css"
 assets-dir = "assets"
 bin-features = ["ssr"]
 lib-features = ["hydrate"]

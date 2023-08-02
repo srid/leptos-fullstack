@@ -35,7 +35,7 @@ fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new("Hello from frontend".to_string());
     let things = create_local_resource(cx, move || (), move |_| read_things());
     view! { cx,
-        <div class="flex flex-col items-center justify-center min-h-screen bg-red-600">
+        <div class="flex flex-col items-center justify-center min-h-screen bg-blue-300">
             <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg">
                 <Header1 text="Welcome to leptos-fullstack template" />
                 <div class="items-left">
