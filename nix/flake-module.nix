@@ -3,9 +3,6 @@
 let
   inherit (flake-parts-lib)
     mkPerSystemOption;
-  inherit (lib)
-    mkOption
-    types;
 in
 {
   options = {
@@ -25,6 +22,7 @@ in
             craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
 
             # When filtering sources, we want to allow assets other than .rs files
+            # TODO: Don't hardcode these!
             src = lib.cleanSourceWith {
               src = self; # The original, unfiltered source
               filter = path: type:
@@ -38,6 +36,7 @@ in
               ;
             };
 
+            # Crane builder for cargo-leptos projects
             craneBuild = rec {
               args = {
                 inherit src;
