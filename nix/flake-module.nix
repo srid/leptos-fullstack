@@ -52,7 +52,7 @@ in
               package = craneLib.buildPackage (args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
-                doCheck = false; # FIXME: https://github.com/benwis/benwis_leptos/issues/2
+                cargoTestCommand = "cargo leptos test --release -vvv";
                 nativeBuildInputs = [
                   pkgs.makeWrapper
                 ];
