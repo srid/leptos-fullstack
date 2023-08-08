@@ -8,6 +8,13 @@ in
   options = {
     perSystem = mkPerSystemOption
       ({ config, self', inputs', pkgs, system, ... }: {
+        options = {
+          leptos-fullstack.overrideCraneArgs = lib.mkOption {
+            type = lib.types.functionTo lib.types.attrs;
+            default = _: { };
+            description = "Override crane args for the leptos-fullstack package";
+          };
+        };
         config =
           let
             cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
@@ -49,7 +56,7 @@ in
                 ];
               };
               cargoArtifacts = craneLib.buildDepsOnly args;
-              package = craneLib.buildPackage (args // {
+              buildArgs = args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = "cargo leptos build --release -vvv";
                 cargoTestCommand = "cargo leptos test --bin-features=ssr --lib-features=hydrate --release -vvv";
@@ -63,7 +70,8 @@ in
                   wrapProgram $out/bin/${name} \
                     --set LEPTOS_SITE_ROOT $out/bin/site
                 '';
-              });
+              };
+              package = craneLib.buildPackage (buildArgs // config.leptos-fullstack.overrideCraneArgs buildArgs);
             };
 
             rustDevShell = pkgs.mkShell {
