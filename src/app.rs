@@ -24,12 +24,20 @@ pub fn App(cx: Scope) -> impl IntoView {
             view! { cx, <NotFound /> }.into_view(cx)
         }>
             <Routes>
-                <Route path="" view=  move |cx| view! { cx, <Home/> }/>
+                <Route path="" view=Home />
+                <Route path="/about" view=About />
             </Routes>
         </Router>
     }
 }
 
+#[component]
+fn About(cx: Scope) -> impl IntoView {
+    view! {cx,
+        <p>This is about.</p>
+        Go back to <Link link="/" text="home" />.
+    }
+}
 #[component]
 fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new("Hello from frontend".to_string());
@@ -65,6 +73,7 @@ fn Home(cx: Scope) -> impl IntoView {
                     }}
                     <Link link="/hello" text="request backend /hello API" rel="external" />
                     <div><Link link="/sdf" text="broken link" /></div>
+                    <div><Link link="/about" text="About page" /></div>
                     <Counter />
                 </div>
             </div>
