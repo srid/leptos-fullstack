@@ -24,6 +24,7 @@ in
               extensions = [
                 "rust-src"
                 "rust-analyzer"
+                "clippy"
               ];
             };
             craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
@@ -72,6 +73,11 @@ in
                 '';
               };
               package = craneLib.buildPackage (buildArgs // config.leptos-fullstack.overrideCraneArgs buildArgs);
+
+              check = craneLib.cargoClippy (args // {
+                inherit cargoArtifacts;
+                cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+              });
             };
 
             rustDevShell = pkgs.mkShell {
@@ -101,6 +107,8 @@ in
           {
             # Rust package
             packages.${name} = craneBuild.package;
+
+            checks."${name}-clippy" = craneBuild.check;
 
             # Rust dev environment
             devShells.${name} = pkgs.mkShell {
