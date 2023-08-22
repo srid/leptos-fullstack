@@ -52,6 +52,6 @@ pub async fn not_found_handler(
 
 #[debug_handler]
 async fn root() -> String {
-    let thing = Thing::new("Hello from backend".to_string());
+    let thing = Thing::new(42, "Hello from backend".to_string());
     serde_json::to_string(&thing).unwrap()
 }

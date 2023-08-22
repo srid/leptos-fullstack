@@ -19,6 +19,10 @@ pub fn App(cx: Scope) -> impl IntoView {
                 <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg">
                     <Routes>
                         <Route path="" view=Home/>
+                        <Route path="/things" view=Things>
+                            <Route path="" view=ThingsList/>
+                            <Route path=":id" view=ThingView/>
+                        </Route>
                         <Route path="/about" view=About/>
                     </Routes>
                 </div>
@@ -42,7 +46,7 @@ fn About(cx: Scope) -> impl IntoView {
 }
 #[component]
 fn Home(cx: Scope) -> impl IntoView {
-    let thing = Thing::new("Hello from frontend".to_string());
+    let thing = Thing::new(0, "Hello from frontend".to_string());
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
         <Header1 text="Welcome to leptos-fullstack template"/>
@@ -54,26 +58,9 @@ fn Home(cx: Scope) -> impl IntoView {
             <p class="my-1">
                 "These values ⤵️ are generated in-server (via server functions):"
             </p>
-            <pre>"fn_url: " {ReadThings::url()}</pre>
-            <SuspenseWithErrorHandling>
-            {move || {
-                things
-                    .read(cx)
-                    .map(move |v| {
-                        v
-                            .map(|things| {
-                                log!("things: {:?}", things);
-                                things
-                                    .into_iter()
-                                    .map(move |thing| {
-
-                                        view! { cx, <li>{thing}</li> }
-                                    })
-                                    .collect_view(cx)
-                            })
-                    })
-            }}
-            </SuspenseWithErrorHandling>
+            <div>
+                <Link link="/things" text="Things page"/>
+            </div>
 
             <Link link="/hello" text="request backend /hello API" rel="external"/>
             <div>
@@ -83,6 +70,97 @@ fn Home(cx: Scope) -> impl IntoView {
                 <Link link="/about" text="About page"/>
             </div>
             <Counter/>
+        </div>
+    }
+}
+
+#[component]
+fn Things(cx: Scope) -> impl IntoView {
+    view! { cx,
+        <Header1 text="Things"/>
+        <div class="items-left">
+            <Header2 text="create_resource on Thing"/>
+            <Outlet/>
+        </div>
+    }
+}
+
+#[component]
+fn ThingsList(cx: Scope) -> impl IntoView {
+    let things = create_resource(cx, move || (), move |_| read_things());
+    view! { cx,
+        <h2>"Thing List"</h2>
+        <SuspenseWithErrorHandling>
+            {move || {
+                things
+                    .read(cx)
+                    .map(move |v| {
+                        v.map(|things| {
+                            log!("things: {:?}", things);
+                            things
+                                .into_iter()
+                                .map(move |thing| {
+
+                                    view! { cx,
+                                        <li>
+                                            <a href=format!("/things/{}", thing.id)>{thing}</a>
+                                        </li>
+                                    }
+                                })
+                                .collect_view(cx)
+                        })
+                    })
+            }}
+
+        </SuspenseWithErrorHandling>
+
+        <div>
+            <Link link="/" text="Main page"/>
+        </div>
+        <div>
+            <Link link="/things/other" text="Bug Other"/>
+        </div>
+    }
+}
+
+#[component]
+fn ThingView(cx: Scope) -> impl IntoView {
+    let params = use_params_map(cx);
+    let id = move || params.with(|params| params.get("id").cloned().unwrap_or_default());
+
+    let things = create_resource(cx, move || (), move |_| read_things());
+    view! { cx,
+        <h2>"Thing: " {id}</h2>
+        <SuspenseWithErrorHandling>
+            {move || {
+                let id: u16 = id().parse::<u16>().unwrap();
+                things
+                    .read(cx)
+                    .map(move |v| {
+                        v.map(|things| {
+                            log!("things: {:?}", things);
+                            things
+                                .into_iter()
+                                .find(|thing| {
+                                    log!("thing.id: {:?} == id: {:?}", thing.id, id);
+                                    thing.id == id
+                                })
+                                .map(move |thing| {
+
+                                    view! { cx, <li>{thing}</li> }
+                                })
+                                .collect_view(cx)
+                        })
+                    })
+            }}
+
+        </SuspenseWithErrorHandling>
+
+        <div>
+            <Link link="/" text="Main page"/>
+        </div>
+        <div>
+            <Link link="/things" text="Things Home"/>
         </div>
     }
 }
