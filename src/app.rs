@@ -3,7 +3,7 @@ use leptos::*;
 use leptos_meta::*;
 use leptos_router::*;
 
-use crate::thing::{read_things, ReadThings, Thing};
+use crate::thing::{read_things, Thing};
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
@@ -47,7 +47,6 @@ fn About(cx: Scope) -> impl IntoView {
 #[component]
 fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new(0, "Hello from frontend".to_string());
-    let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
         <Header1 text="Welcome to leptos-fullstack template"/>
         <div class="items-left">
@@ -86,17 +85,15 @@ fn Things(cx: Scope) -> impl IntoView {
 }
 
 #[component]
-fn ThingsList(cx: Scope) -> impl IntoView {
+fn ThingsNav(cx: Scope) -> impl IntoView {
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
-        <h2>"Thing List"</h2>
         <SuspenseWithErrorHandling>
             {move || {
                 things
                     .read(cx)
                     .map(move |v| {
                         v.map(|things| {
-                            log!("things: {:?}", things);
                             things
                                 .into_iter()
                                 .map(move |thing| {
@@ -113,7 +110,15 @@ fn ThingsList(cx: Scope) -> impl IntoView {
             }}
 
         </SuspenseWithErrorHandling>
+    }
+}
 
+#[component]
+fn ThingsList(cx: Scope) -> impl IntoView {
+    view! { cx,
+        <h2>"Thing List"</h2>
+
+        <ThingsNav />
         <div>
             <Link link="/" text="Main page"/>
         </div>
@@ -130,6 +135,8 @@ fn ThingView(cx: Scope) -> impl IntoView {
 
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
+
+        <ThingsNav />
         <h2>"Thing: " {id}</h2>
         <SuspenseWithErrorHandling>
             {move || {
