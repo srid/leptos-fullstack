@@ -43,44 +43,37 @@ fn About(cx: Scope) -> impl IntoView {
 #[component]
 fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new("Hello from frontend".to_string());
-    let things = create_local_resource(cx, move || (), move |_| read_things());
+    let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
         <Header1 text="Welcome to leptos-fullstack template"/>
         <div class="items-left">
             <Header2 text="Frontend"/>
             <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
-            <pre>{thing.browser_view()}</pre>
+            <pre>{thing}</pre>
             <Header2 text="Backend"/>
             <p class="my-1">
                 "These values ⤵️ are generated in-server (via server functions):"
             </p>
             <pre>"fn_url: " {ReadThings::url()}</pre>
+            <SuspenseWithErrorHandling>
             {move || {
                 things
                     .read(cx)
-                    .map(move |things| {
-                        log!("things: {:?}", things);
-                        match things {
-                            Err(e) => {
-                                view! { cx,
-                                    <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">
-                                        "Server Error: " {e.to_string()}
-                                    </pre>
-                                }
-                                    .into_view(cx)
-                            }
-                            Ok(things) => {
+                    .map(move |v| {
+                        v
+                            .map(|things| {
+                                log!("things: {:?}", things);
                                 things
                                     .into_iter()
                                     .map(move |thing| {
 
-                                        view! { cx, <li>{thing.browser_view()}</li> }
+                                        view! { cx, <li>{thing}</li> }
                                     })
                                     .collect_view(cx)
-                            }
-                        }
+                            })
                     })
             }}
+            </SuspenseWithErrorHandling>
 
             <Link link="/hello" text="request backend /hello API" rel="external"/>
             <div>
@@ -148,6 +141,51 @@ fn Counter(cx: Scope) -> impl IntoView {
                 "Click Me: "
                 {count}
             </button>
+        </div>
+    }
+}
+
+/// Like [Suspense] but also handles errors using [ErrorBoundary]
+#[component(transparent)]
+pub fn SuspenseWithErrorHandling(cx: Scope, children: ChildrenFn) -> impl IntoView {
+    let children = store_value(cx, children);
+    view! { cx,
+        <Suspense fallback=move || view! { cx, <Spinner/> }>
+            <ErrorBoundary fallback=|cx, errors| {
+                view! { cx, <Errors errors=errors.get()/> }
+            }>{children.with_value(|c| c(cx))}</ErrorBoundary>
+        </Suspense>
+    }
+}
+
+/// Display errors to the user
+#[component]
+pub fn Errors(cx: Scope, errors: Errors) -> impl IntoView {
+    tracing::error!("Errors: {:?}", errors);
+    view! { cx,
+        <div class="flex flex-row justify-center overflow-auto text-xl text-white bg-error-500">
+            <div class="font-mono whitespace-pre-wrap">
+                <ul>
+                    {errors
+                        .into_iter()
+                        .map(|(_, e)| view! { cx, <li>{e.to_string()}</li> })
+                        .collect_view(cx)}
+                </ul>
+            </div>
+        </div>
+    }
+}
+
+// A loading spinner
+#[component]
+pub fn Spinner(cx: Scope) -> impl IntoView {
+    view! { cx,
+        <div
+            class="animate-spin inline-block w-6 h-6 border-[3px] border-current border-t-transparent text-blue-600 rounded-full"
+            role="status"
+            aria-label="loading"
+        >
+            <span class="sr-only">"Loading..."</span>
         </div>
     }
 }

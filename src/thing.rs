@@ -15,9 +15,12 @@ impl Thing {
             text,
         }
     }
-    /// How this thing is displayed in the browser
-    pub fn browser_view(&self) -> String {
-        format!("Thing({}): {}", self.id, self.text)
+}
+
+impl IntoView for Thing {
+    fn into_view(self, cx: Scope) -> View {
+        view! { cx, <span class="font-mono">{format!("Thing({}): {}", self.id, self.text)}</span> }
+        .into_view(cx)
     }
 }
 
