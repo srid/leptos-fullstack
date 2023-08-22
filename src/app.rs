@@ -224,7 +224,7 @@ pub fn SuspenseWithErrorHandling(cx: Scope, children: ChildrenFn) -> impl IntoVi
 /// Display errors to the user
 #[component]
 pub fn Errors(cx: Scope, errors: Errors) -> impl IntoView {
-    tracing::error!("Errors: {:?}", errors);
+    error!("Errors: {:?}", errors);
     view! { cx,
         <div class="flex flex-row justify-center overflow-auto text-xl text-white bg-error-500">
             <div class="font-mono whitespace-pre-wrap">
