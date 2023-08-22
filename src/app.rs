@@ -78,6 +78,7 @@ fn Things(cx: Scope) -> impl IntoView {
     view! { cx,
         <Header1>"Things"</Header1>
         <div class="items-left">
+            <ThingsNav/>
             <Outlet/>
         </div>
     }
@@ -125,7 +126,6 @@ fn ThingsList(cx: Scope) -> impl IntoView {
     view! { cx,
         <Header2>"List of things"</Header2>
 
-        <ThingsNav/>
         <div>
             <Link link="/" text="Main page"/>
         </div>
@@ -139,7 +139,6 @@ fn ThingView(cx: Scope) -> impl IntoView {
 
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
-        <ThingsNav/>
         <Header2>"Thing: " {id}</Header2>
         <SuspenseWithErrorHandling>
             {move || {
