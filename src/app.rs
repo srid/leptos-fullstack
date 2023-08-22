@@ -23,10 +23,15 @@ pub fn App(cx: Scope) -> impl IntoView {
             view! { cx, <NotFound/> }
                 .into_view(cx)
         }>
-            <Routes>
-                <Route path="" view=Home/>
-                <Route path="/about" view=About/>
-            </Routes>
+
+            <div class="flex flex-col items-center justify-center min-h-screen bg-blue-300">
+                <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg">
+                    <Routes>
+                        <Route path="" view=Home/>
+                        <Route path="/about" view=About/>
+                    </Routes>
+                </div>
+            </div>
         </Router>
     }
 }
@@ -35,11 +40,13 @@ pub fn App(cx: Scope) -> impl IntoView {
 fn About(cx: Scope) -> impl IntoView {
     view! { cx,
         <p>
-            This is about.
+            This is about page.
         </p>
-        Go back to
-        <Link link="/" text="home"/>
-        .
+        <p>
+            Go back to
+            <Link link="/" text="home"/>
+            .
+        </p>
     }
 }
 #[component]
@@ -47,52 +54,51 @@ fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new("Hello from frontend".to_string());
     let things = create_local_resource(cx, move || (), move |_| read_things());
     view! { cx,
-        <div class="flex flex-col items-center justify-center min-h-screen bg-blue-300">
-            <div class="flex flex-col items-center justify-start px-4 py-8 mx-auto bg-white border-4 rounded-lg">
-                <Header1 text="Welcome to leptos-fullstack template"/>
-                <div class="items-left">
-                    <Header2 text="Frontend"/>
-                    <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
-                    <pre>{thing.browser_view()}</pre>
-                    <Header2 text="Backend"/>
-                    <pre>"fn_url: " {ReadThings::url()}</pre>
-                    {move || {
-                        things
-                            .read(cx)
-                            .map(move |things| {
-                                log!("things: {:?}", things);
-                                match things {
-                                    Err(e) => {
-                                        view! { cx,
-                                            <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">
-                                                "Server Error: " {e.to_string()}
-                                            </pre>
-                                        }
-                                            .into_view(cx)
-                                    }
-                                    Ok(things) => {
-                                        things
-                                            .into_iter()
-                                            .map(move |thing| {
-
-                                                view! { cx, <li>{thing.browser_view()}</li> }
-                                            })
-                                            .collect_view(cx)
-                                    }
+        <Header1 text="Welcome to leptos-fullstack template"/>
+        <div class="items-left">
+            <Header2 text="Frontend"/>
+            <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
+            <pre>{thing.browser_view()}</pre>
+            <Header2 text="Backend"/>
+            <p class="my-1">
+                "These values ⤵️ are generated in-server (via server functions):"
+            </p>
+            <pre>"fn_url: " {ReadThings::url()}</pre>
+            {move || {
+                things
+                    .read(cx)
+                    .map(move |things| {
+                        log!("things: {:?}", things);
+                        match things {
+                            Err(e) => {
+                                view! { cx,
+                                    <pre class="p-2 my-2 font-bold bg-red-200 shadow-lg">
+                                        "Server Error: " {e.to_string()}
+                                    </pre>
                                 }
-                            })
-                    }}
+                                    .into_view(cx)
+                            }
+                            Ok(things) => {
+                                things
+                                    .into_iter()
+                                    .map(move |thing| {
 
-                    <Link link="/hello" text="request backend /hello API" rel="external"/>
-                    <div>
-                        <Link link="/sdf" text="broken link"/>
-                    </div>
-                    <div>
-                        <Link link="/about" text="About page"/>
-                    </div>
-                    <Counter/>
-                </div>
+                                        view! { cx, <li>{thing.browser_view()}</li> }
+                                    })
+                                    .collect_view(cx)
+                            }
+                        }
+                    })
+            }}
+
+            <Link link="/hello" text="request backend /hello API" rel="external"/>
+            <div>
+                <Link link="/sdf" text="broken link"/>
             </div>
+            <div>
+                <Link link="/about" text="About page"/>
+            </div>
+            <Counter/>
         </div>
     }
 }
