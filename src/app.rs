@@ -50,10 +50,10 @@ fn Home(cx: Scope) -> impl IntoView {
     view! { cx,
         <Header1 text="Welcome to leptos-fullstack template"/>
         <div class="items-left">
-            <Header2 text="Frontend"/>
+            <Header2>"Frontend"</Header2>
             <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
             <pre>{thing}</pre>
-            <Header2 text="Backend"/>
+            <Header2>"Backend"</Header2>
             <p class="my-1">
                 "These values ⤵️ are generated in-server (via server functions):"
             </p>
@@ -61,6 +61,7 @@ fn Home(cx: Scope) -> impl IntoView {
                 <Link link="/things" text="Things page"/>
             </div>
 
+            <Header2>"Links"</Header2>
             <Link link="/hello" text="request backend /hello API" rel="external"/>
             <div>
                 <Link link="/sdf" text="broken link"/>
@@ -68,7 +69,6 @@ fn Home(cx: Scope) -> impl IntoView {
             <div>
                 <Link link="/about" text="About page"/>
             </div>
-            <Counter/>
         </div>
     }
 }
@@ -78,7 +78,6 @@ fn Things(cx: Scope) -> impl IntoView {
     view! { cx,
         <Header1 text="Things"/>
         <div class="items-left">
-            <Header2 text="create_resource on Thing"/>
             <Outlet/>
         </div>
     }
@@ -88,42 +87,47 @@ fn Things(cx: Scope) -> impl IntoView {
 fn ThingsNav(cx: Scope) -> impl IntoView {
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
-        <SuspenseWithErrorHandling>
-            {move || {
-                things
-                    .read(cx)
-                    .map(move |v| {
-                        v.map(|things| {
-                            things
-                                .into_iter()
-                                .map(move |thing| {
+        <ul>
+            <SuspenseWithErrorHandling>
+                {move || {
+                    things
+                        .read(cx)
+                        .map(move |v| {
+                            v.map(|things| {
+                                things
+                                    .into_iter()
+                                    .map(move |thing| {
 
-                                    view! { cx,
-                                        <li>
-                                            <a href=format!("/things/{}", thing.id)>{thing}</a>
-                                        </li>
-                                    }
-                                })
-                                .collect_view(cx)
+                                        view! { cx,
+                                            <li>
+                                                <a
+                                                    class="p-2 m-2 underline hover:bg-blue-200"
+                                                    href=format!("/things/{}", thing.id)
+                                                >
+                                                    "Thing "
+                                                    {thing.id}
+                                                </a>
+                                            </li>
+                                        }
+                                    })
+                                    .collect_view(cx)
+                            })
                         })
-                    })
-            }}
+                }}
 
-        </SuspenseWithErrorHandling>
+            </SuspenseWithErrorHandling>
+        </ul>
     }
 }
 
 #[component]
 fn ThingsList(cx: Scope) -> impl IntoView {
     view! { cx,
-        <h2>"Thing List"</h2>
+        <Header2>"List of things"</Header2>
 
-        <ThingsNav />
+        <ThingsNav/>
         <div>
             <Link link="/" text="Main page"/>
-        </div>
-        <div>
-            <Link link="/things/other" text="Bug Other"/>
         </div>
     }
 }
@@ -135,9 +139,8 @@ fn ThingView(cx: Scope) -> impl IntoView {
 
     let things = create_resource(cx, move || (), move |_| read_things());
     view! { cx,
-
-        <ThingsNav />
-        <h2>"Thing: " {id}</h2>
+        <ThingsNav/>
+        <Header2>"Thing: " {id}</Header2>
         <SuspenseWithErrorHandling>
             {move || {
                 let id: u16 = id().parse::<u16>().unwrap();
@@ -148,10 +151,7 @@ fn ThingView(cx: Scope) -> impl IntoView {
                             log!("things: {:?}", things);
                             things
                                 .into_iter()
-                                .find(|thing| {
-                                    log!("thing.id: {:?} == id: {:?}", thing.id, id);
-                                    thing.id == id
-                                })
+                                .find(|thing| thing.id == id)
                                 .map(move |thing| {
 
                                     view! { cx, <li>{thing}</li> }
@@ -164,10 +164,10 @@ fn ThingView(cx: Scope) -> impl IntoView {
         </SuspenseWithErrorHandling>
 
         <div>
-            <Link link="/" text="Main page"/>
+            <Link link="/things" text="Things Home"/>
         </div>
         <div>
-            <Link link="/things" text="Things Home"/>
+            <Link link="/" text="Main page"/>
         </div>
     }
 }
@@ -191,8 +191,8 @@ fn Header1(cx: Scope, text: &'static str) -> impl IntoView {
     view! { cx, <h1 class="my-3 text-3xl font-bold">{text}</h1> }
 }
 #[component]
-fn Header2(cx: Scope, text: &'static str) -> impl IntoView {
-    view! { cx, <h2 class="my-2 text-2xl font-bold text-gray-600">{text}</h2> }
+fn Header2(cx: Scope, children: ChildrenFn) -> impl IntoView {
+    view! { cx, <h2 class="my-2 text-2xl font-bold text-gray-600">{children(cx)}</h2> }
 }
 
 #[component]
@@ -208,28 +208,6 @@ fn NotFound(cx: Scope) -> impl IntoView {
         <div class="flex flex-row justify-center text-3xl text-red-500">"404: Page not found"</div>
     }
 }
-
-/// Renders the home page of your application.
-#[component]
-fn Counter(cx: Scope) -> impl IntoView {
-    // Creates a reactive value to update the button
-    let (count, set_count) = create_signal(cx, 0);
-    let on_click = move |_| set_count.update(|count| *count += 1);
-
-    view! { cx,
-        <div class="mx-auto my-8 text-center md:container">
-            <Header2 text="Leptops Counter"/>
-            <button
-                class="p-4 border-2 rounded-full shadow-lg active:shadow-none bg-blue-50 hover:bg-blue-200 active:bg-blue-500"
-                on:click=on_click
-            >
-                "Click Me: "
-                {count}
-            </button>
-        </div>
-    }
-}
-
 /// Like [Suspense] but also handles errors using [ErrorBoundary]
 #[component(transparent)]
 pub fn SuspenseWithErrorHandling(cx: Scope, children: ChildrenFn) -> impl IntoView {
