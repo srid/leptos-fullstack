@@ -44,6 +44,7 @@
           ];
           nativeBuildInputs = with pkgs; [
             just
+            cargo-watch
           ];
         };
       };

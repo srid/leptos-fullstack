@@ -10,3 +10,8 @@ fmt:
 # Run the project locally
 watch *ARGS:
     cargo leptos watch
+
+# Run tests (backend & frontend)
+test:
+    cargo watch -- cargo leptos test
+
