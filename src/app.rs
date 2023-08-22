@@ -1,12 +1,9 @@
-use crate::thing::{read_things, ReadThings, Thing};
 use cfg_if::cfg_if;
-#[cfg(feature = "ssr")]
-use http::status::StatusCode;
 use leptos::*;
-#[cfg(feature = "ssr")]
-use leptos_axum::ResponseOptions;
 use leptos_meta::*;
 use leptos_router::*;
+
+use crate::thing::{read_things, ReadThings, Thing};
 
 #[component]
 pub fn App(cx: Scope) -> impl IntoView {
@@ -15,13 +12,7 @@ pub fn App(cx: Scope) -> impl IntoView {
     view! { cx,
         <Stylesheet id="leptos" href="/pkg/leptos-fullstack.css"/>
         <Router fallback=|cx| {
-            cfg_if! {
-                if #[cfg(feature = "ssr")] { if let Some(response) = use_context::< ResponseOptions
-                > (cx) { response.set_status(StatusCode::NOT_FOUND); } }
-            }
-
             view! { cx, <NotFound/> }
-                .into_view(cx)
         }>
 
             <div class="flex flex-col items-center justify-center min-h-screen bg-blue-300">
@@ -128,6 +119,13 @@ fn Header2(cx: Scope, text: &'static str) -> impl IntoView {
 
 #[component]
 fn NotFound(cx: Scope) -> impl IntoView {
+    cfg_if! { if #[cfg(feature="ssr")] {
+        use http::status::StatusCode;
+        use leptos_axum::ResponseOptions;
+        if let Some(response) = use_context::<ResponseOptions>(cx) {
+            response.set_status(StatusCode::NOT_FOUND);
+        }
+    }}
     view! { cx,
         <div class="flex flex-row justify-center text-3xl text-red-500">"404: Page not found"</div>
     }
