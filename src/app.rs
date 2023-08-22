@@ -48,7 +48,7 @@ fn About(cx: Scope) -> impl IntoView {
 fn Home(cx: Scope) -> impl IntoView {
     let thing = Thing::new(0, "Hello from frontend".to_string());
     view! { cx,
-        <Header1 text="Welcome to leptos-fullstack template"/>
+        <Header1>"Welcome to leptos-fullstack template"</Header1>
         <div class="items-left">
             <Header2>"Frontend"</Header2>
             <p class="my-1">"This value ⤵️ is generated in-browser:"</p>
@@ -76,7 +76,7 @@ fn Home(cx: Scope) -> impl IntoView {
 #[component]
 fn Things(cx: Scope) -> impl IntoView {
     view! { cx,
-        <Header1 text="Things"/>
+        <Header1>"Things"</Header1>
         <div class="items-left">
             <Outlet/>
         </div>
@@ -187,8 +187,8 @@ fn Link(
 }
 
 #[component]
-fn Header1(cx: Scope, text: &'static str) -> impl IntoView {
-    view! { cx, <h1 class="my-3 text-3xl font-bold">{text}</h1> }
+fn Header1(cx: Scope, children: ChildrenFn) -> impl IntoView {
+    view! { cx, <h1 class="my-3 text-3xl font-bold">{children(cx)}</h1> }
 }
 #[component]
 fn Header2(cx: Scope, children: ChildrenFn) -> impl IntoView {
