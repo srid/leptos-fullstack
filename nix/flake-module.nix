@@ -47,7 +47,7 @@ in
             # Crane builder for cargo-leptos projects
             craneBuild = rec {
               crateName = lib.replaceStrings [ "-" ] [ "_" ] name;
-              args = {
+              defaultArgs = {
                 inherit src;
                 pname = name;
                 version = version;
@@ -64,6 +64,7 @@ in
                 '';
                 cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
               };
+              args = defaultArgs // config.leptos-fullstack.overrideCraneArgs defaultArgs;
               # A dummy Leptos app using the same Cargo.* files as the real app
               dummySrc =
                 let
@@ -109,7 +110,7 @@ in
                     --set LEPTOS_SITE_ROOT $out/bin/site
                 '';
               };
-              package = craneLib.buildPackage (buildArgs // config.leptos-fullstack.overrideCraneArgs buildArgs);
+              package = craneLib.buildPackage buildArgs;
 
               check = craneLib.cargoClippy (args // {
                 inherit cargoArtifacts;
