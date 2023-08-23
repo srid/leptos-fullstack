@@ -90,6 +90,9 @@ in
                   find target/server -name \*${crateName}\*lib | xargs rm -rf
                   find target/server -name \*${name}\*lib | xargs rm -rf
                 '';
+                cargoTestCommand = ''
+                  cargo leptos test --release -vvv
+                '';
               });
               buildArgs = args // {
                 inherit cargoArtifacts;
