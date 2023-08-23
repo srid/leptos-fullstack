@@ -87,8 +87,8 @@ in
                   cat Cargo.toml
                   cargo leptos build --release -vvv
                   # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
-                  find target/server -name \*${crateName}\* | xargs rm -rf
-                  find target/server -name \*${name}\* | xargs rm -rf
+                  find target/server -name \*${crateName}\*lib | xargs rm -rf
+                  find target/server -name \*${name}\*lib | xargs rm -rf
                 '';
               });
               buildArgs = args // {
