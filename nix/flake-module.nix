@@ -145,10 +145,7 @@ in
           {
             # Rust package
             packages.${name} = craneBuild.package;
-
-            packages.deps = craneBuild.cargoArtifacts;
-            packages.dummy = craneBuild.dummySrc;
-            packages.cargoOnly = craneBuild.cargoOnly;
+            packages."${name}-deps" = craneBuild.cargoArtifacts;
 
             checks."${name}-clippy" = craneBuild.check;
 
