@@ -59,7 +59,12 @@ in
                 nativeBuildInputs = [
                   pkgs.makeWrapper
                 ];
+                cargoTestCommand = ''
+                  cargo leptos test --release -vvv
+                '';
+                cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
               };
+              # A dummy Leptos app using the same Cargo.* files as the real app
               dummySrc =
                 let
                   cargoOnly = builtins.path {
@@ -84,23 +89,17 @@ in
                 inherit dummySrc;
                 cargoVendorDir = craneLib.vendorCargoDeps args;
                 buildPhaseCargoCommand = ''
-                  cat Cargo.toml
                   cargo leptos build --release -vvv
                   # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
                   find target/server -name \*${crateName}\*lib | xargs rm -rf
                   find target/server -name \*${name}\*lib | xargs rm -rf
                 '';
-                cargoTestCommand = ''
-                  cargo leptos test --release -vvv
-                '';
+
               });
               buildArgs = args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = ''
                   cargo leptos build --release -vvv;
-                '';
-                cargoTestCommand = ''
-                  cargo leptos test --release -vvv
                 '';
                 installPhaseCommand = ''
                   mkdir -p $out/bin
@@ -114,7 +113,6 @@ in
 
               check = craneLib.cargoClippy (args // {
                 inherit cargoArtifacts;
-                cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
               });
             };
 
