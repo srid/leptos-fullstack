@@ -46,6 +46,7 @@ in
 
             # Crane builder for cargo-leptos projects
             craneBuild = rec {
+              crateName = lib.replaceStrings [ "-" ] [ "_" ] name;
               args = {
                 inherit src;
                 pname = name;
@@ -55,15 +56,49 @@ in
                   pkgs.binaryen # Provides wasm-opt
                   tailwindcss
                 ];
-              };
-              cargoArtifacts = craneLib.buildDepsOnly args;
-              buildArgs = args // {
-                inherit cargoArtifacts;
-                buildPhaseCargoCommand = "cargo leptos build --release -vvv";
-                cargoTestCommand = "cargo leptos test --release -vvv";
                 nativeBuildInputs = [
                   pkgs.makeWrapper
                 ];
+              };
+              dummySrc =
+                let
+                  cargoOnly = builtins.path {
+                    name = "dummy-src";
+                    path = src;
+                    filter = path: _: baseNameOf path == "Cargo.toml" || baseNameOf path == "Cargo.lock";
+                  };
+                in
+                pkgs.runCommand "dummy-src"
+                  {
+                    ASSETS = cargoToml.package.metadata.leptos.assets-dir;
+                    TAILWIND_INPUT_FILE = cargoToml.package.metadata.leptos.tailwind-input-file;
+                  } ''
+                  mkdir -p $out
+                  cp -r ${./dummy}/src $out/
+                  mkdir -p $out/$ASSETS $out/''$(dirname $TAILWIND_INPUT_FILE)
+                  touch $out/$TAILWIND_INPUT_FILE
+                  cp -r ${cargoOnly}/* $out/
+                '';
+              cargoArtifacts = craneLib.buildDepsOnly (args // {
+                src = null;
+                inherit dummySrc;
+                cargoVendorDir = craneLib.vendorCargoDeps args;
+                buildPhaseCargoCommand = ''
+                  cat Cargo.toml
+                  cargo leptos build --release -vvv
+                  # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
+                  find target/server -name \*${crateName}\* | xargs rm -rf
+                  find target/server -name \*${name}\* | xargs rm -rf
+                '';
+              });
+              buildArgs = args // {
+                inherit cargoArtifacts;
+                buildPhaseCargoCommand = ''
+                  cargo leptos build --release -vvv;
+                '';
+                cargoTestCommand = ''
+                  cargo leptos test --release -vvv
+                '';
                 installPhaseCommand = ''
                   mkdir -p $out/bin
                   cp target/server/release/${name} $out/bin/
@@ -107,6 +142,10 @@ in
           {
             # Rust package
             packages.${name} = craneBuild.package;
+
+            packages.deps = craneBuild.cargoArtifacts;
+            packages.dummy = craneBuild.dummySrc;
+            packages.cargoOnly = craneBuild.cargoOnly;
 
             checks."${name}-clippy" = craneBuild.check;
 
