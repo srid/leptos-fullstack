@@ -91,15 +91,16 @@ in
                 cargoVendorDir = craneLib.vendorCargoDeps args;
                 buildPhaseCargoCommand = ''
                   cargo leptos build --release -vvv
-                  # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
-                  find target/server -name \*${crateName}\*lib | xargs rm -rf
-                  find target/server -name \*${name}\*lib | xargs rm -rf
                 '';
 
               });
               buildArgs = args // {
                 inherit cargoArtifacts;
                 buildPhaseCargoCommand = ''
+                  # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
+                  find target/server -name \*${crateName}\*lib | xargs rm -rf
+                  find target/server -name \*${name}\*lib | xargs rm -rf
+                  # Do the actual build
                   cargo leptos build --release -vvv;
                 '';
                 installPhaseCommand = ''
