@@ -3,4 +3,6 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 #[cfg(feature = "hydrate")]
 #[wasm_bindgen]
-pub fn hydrate() {}
+pub fn hydrate() {
+    panic!("Dummy!")
+}
