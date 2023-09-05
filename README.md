@@ -29,6 +29,9 @@ just test
 
 ```
 nix build
+
+# To build the rust doccs
+nix build .#leptos-fullstack-docs
 ```
 
 You can also `nix run` the app directly.

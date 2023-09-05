@@ -115,6 +115,10 @@ in
               check = craneLib.cargoClippy (args // {
                 inherit cargoArtifacts;
               });
+
+              doc = craneLib.cargoDoc (args // {
+                inherit cargoArtifacts;
+              });
             };
 
             rustDevShell = pkgs.mkShell {
@@ -145,6 +149,7 @@ in
             # Rust package
             packages.${name} = craneBuild.package;
             packages."${name}-deps" = craneBuild.cargoArtifacts;
+            packages."${name}-doc" = craneBuild.doc;
 
             checks."${name}-clippy" = craneBuild.check;
 
