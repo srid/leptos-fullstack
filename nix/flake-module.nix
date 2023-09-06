@@ -14,20 +14,29 @@ in
             default = _: { };
             description = "Override crane args for the leptos-fullstack package";
           };
-        };
-        config =
-          let
-            cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
-            inherit (cargoToml.package) name version;
 
-            rustToolchain = (pkgs.rust-bin.fromRustupToolchainFile (self + /rust-toolchain.toml)).override {
+          leptos-fullstack.rustToolchain = lib.mkOption {
+            type = lib.types.package;
+            description = "Rust toolchain to use for the leptos-fullstack package";
+            default = (pkgs.rust-bin.fromRustupToolchainFile (self + /rust-toolchain.toml)).override {
               extensions = [
                 "rust-src"
                 "rust-analyzer"
                 "clippy"
               ];
             };
-            craneLib = (inputs.crane.mkLib pkgs).overrideToolchain rustToolchain;
+          };
+
+          leptos-fullstack.craneLib = lib.mkOption {
+            type = lib.types.lazyAttrsOf lib.types.raw;
+            default = (inputs.crane.mkLib pkgs).overrideToolchain config.leptos-fullstack.rustToolchain;
+          };
+        };
+        config =
+          let
+            cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
+            inherit (cargoToml.package) name version;
+            inherit (config.leptos-fullstack) rustToolchain craneLib;
 
             # When filtering sources, we want to allow assets other than .rs files
             # TODO: Don't hardcode these!
