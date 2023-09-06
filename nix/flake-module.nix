@@ -59,7 +59,8 @@ in
 
             # Crane builder for cargo-leptos projects
             craneBuild = rec {
-              args = {
+              crateName = lib.replaceStrings [ "-" ] [ "_" ] name;
+              defaultArgs = {
                 inherit src;
                 pname = name;
                 version = version;
@@ -68,15 +69,53 @@ in
                   pkgs.binaryen # Provides wasm-opt
                   tailwindcss
                 ];
-              };
-              cargoArtifacts = craneLib.buildDepsOnly args;
-              buildArgs = args // {
-                inherit cargoArtifacts;
-                buildPhaseCargoCommand = "cargo leptos build --release -vvv";
-                cargoTestCommand = "cargo leptos test --release -vvv";
                 nativeBuildInputs = [
                   pkgs.makeWrapper
                 ];
+                cargoTestCommand = ''
+                  cargo leptos test --release -vvv
+                '';
+                cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
+              };
+              args = defaultArgs // config.leptos-fullstack.overrideCraneArgs defaultArgs;
+              # A dummy Leptos app using the same Cargo.* files as the real app
+              dummySrc =
+                let
+                  cargoOnly = builtins.path {
+                    name = "dummy-src";
+                    path = src;
+                    filter = path: _: baseNameOf path == "Cargo.toml" || baseNameOf path == "Cargo.lock";
+                  };
+                in
+                pkgs.runCommand "dummy-src"
+                  {
+                    ASSETS = cargoToml.package.metadata.leptos.assets-dir;
+                    TAILWIND_INPUT_FILE = cargoToml.package.metadata.leptos.tailwind-input-file;
+                  } ''
+                  mkdir -p $out
+                  cp -r ${./dummy}/src $out/
+                  mkdir -p $out/$ASSETS $out/''$(dirname $TAILWIND_INPUT_FILE)
+                  touch $out/$TAILWIND_INPUT_FILE
+                  cp -r ${cargoOnly}/* $out/
+                '';
+              cargoArtifacts = craneLib.buildDepsOnly (args // {
+                src = null;
+                inherit dummySrc;
+                cargoVendorDir = craneLib.vendorCargoDeps args;
+                buildPhaseCargoCommand = ''
+                  cargo leptos build --release -vvv
+                '';
+
+              });
+              buildArgs = args // {
+                inherit cargoArtifacts;
+                buildPhaseCargoCommand = ''
+                  # Get rid of the dummy src artifacts, as it can break `cargo leptos build` later.
+                  find target/server -name \*${crateName}\*lib | xargs rm -rf
+                  find target/server -name \*${name}\*lib | xargs rm -rf
+                  # Do the actual build
+                  cargo leptos build --release -vvv;
+                '';
                 installPhaseCommand = ''
                   mkdir -p $out/bin
                   cp target/server/release/${name} $out/bin/
@@ -85,11 +124,10 @@ in
                     --set LEPTOS_SITE_ROOT $out/bin/site
                 '';
               };
-              package = craneLib.buildPackage (buildArgs // config.leptos-fullstack.overrideCraneArgs buildArgs);
+              package = craneLib.buildPackage buildArgs;
 
               check = craneLib.cargoClippy (args // {
                 inherit cargoArtifacts;
-                cargoClippyExtraArgs = "--all-targets --all-features -- --deny warnings";
               });
 
               doc = craneLib.cargoDoc (args // {
@@ -124,6 +162,7 @@ in
           {
             # Rust package
             packages.${name} = craneBuild.package;
+            packages."${name}-deps" = craneBuild.cargoArtifacts;
             packages."${name}-doc" = craneBuild.doc;
 
             checks."${name}-clippy" = craneBuild.check;

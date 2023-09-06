@@ -10,6 +10,7 @@ A Nix template for [full-stack web apps](https://srid.ca/nojs) in Rust using Lep
 - Build system
   - [cargo-leptos](https://github.com/leptos-rs/cargo-leptos)
   - [Nix Flakes](https://zero-to-flakes.com/) + [crane](https://github.com/ipetkov/crane)
+    - Fast builds: avoid rebuilding all crate dependencies when only local sources change
 - Autoformatting using `rustfmt` and `leptosfmt`
 
 ## Running locally
