@@ -31,16 +31,13 @@ in
             type = lib.types.lazyAttrsOf lib.types.raw;
             default = (inputs.crane.mkLib pkgs).overrideToolchain config.leptos-fullstack.rustToolchain;
           };
-        };
-        config =
-          let
-            cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
-            inherit (cargoToml.package) name version;
-            inherit (config.leptos-fullstack) rustToolchain craneLib;
 
+          leptos-fullstack.src = lib.mkOption {
+            type = lib.types.path;
+            description = "Source directory for the leptos-fullstack package";
             # When filtering sources, we want to allow assets other than .rs files
             # TODO: Don't hardcode these!
-            src = lib.cleanSourceWith {
+            default = lib.cleanSourceWith {
               src = self; # The original, unfiltered source
               filter = path: type:
                 (lib.hasSuffix "\.html" path) ||
@@ -49,9 +46,16 @@ in
                 (lib.hasInfix "/assets/" path) ||
                 (lib.hasInfix "/css/" path) ||
                 # Default filter from crane (allow .rs files)
-                (craneLib.filterCargoSources path type)
+                (config.leptos-fullstack.craneLib.filterCargoSources path type)
               ;
             };
+          };
+        };
+        config =
+          let
+            cargoToml = builtins.fromTOML (builtins.readFile (self + /Cargo.toml));
+            inherit (cargoToml.package) name version;
+            inherit (config.leptos-fullstack) rustToolchain craneLib src;
 
             # Crane builder for cargo-leptos projects
             craneBuild = rec {
