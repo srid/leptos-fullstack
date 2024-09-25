@@ -3,13 +3,12 @@ on:
   pull_request:
   push:
 jobs:
-  check:
-    name: Rust project
-    runs-on: ubuntu-latest
+  nix:
+    name: Nix build
+    strategy:
+      matrix:
+        system: [ x86_64-linux ]
+    runs-on: ${{ matrix.system }}
     steps:
-    - uses: actions/checkout@v3
-    - uses: DeterminateSystems/nix-installer-action@main
-    - uses: yaxitech/nix-install-pkgs-action@v3
-      with:
-        packages: "nixpkgs#nixci"
-    - run: nixci
+    - uses: actions/checkout@v4
+    - run: om ci --extra-access-tokens "github.com=${{ secrets.GITHUB_TOKEN }}" run --systems "${{ matrix.system }}"
