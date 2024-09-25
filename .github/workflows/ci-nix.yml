@@ -7,7 +7,7 @@ jobs:
     name: Nix build
     strategy:
       matrix:
-        system: [ x86_64-linux ]
+        system: [ x86_64-linux, aarch64-darwin ]
     runs-on: ${{ matrix.system }}
     steps:
     - uses: actions/checkout@v4
